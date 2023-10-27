@@ -1,5 +1,6 @@
 #pragma leco tool
 
+import casein;
 import voo;
 
-int main() {}
+extern "C" void casein_handle(const casein::event &e) {}
