@@ -1,2 +1,2 @@
 export module voo;
-import vee;
+export import :sires_image;
