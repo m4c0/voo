@@ -1,4 +1,5 @@
 export module voo:sires_image;
+import :guards;
 import silog;
 import stubby;
 import vee;
@@ -55,13 +56,13 @@ public:
 
   [[nodiscard]] auto iv() const noexcept { return *m_iv; }
 
-  void run(vee::command_buffer cb) {
+  void run(const cmd_buf_one_time_submit &cb) {
     if (!m_dirty)
       return;
 
-    vee::cmd_pipeline_barrier(cb, *m_img, vee::from_host_to_transfer);
-    vee::cmd_copy_buffer_to_image(cb, {m_w, m_h}, *m_sbuf, *m_img);
-    vee::cmd_pipeline_barrier(cb, *m_img, vee::from_transfer_to_fragment);
+    vee::cmd_pipeline_barrier(*cb, *m_img, vee::from_host_to_transfer);
+    vee::cmd_copy_buffer_to_image(*cb, {m_w, m_h}, *m_sbuf, *m_img);
+    vee::cmd_pipeline_barrier(*cb, *m_img, vee::from_transfer_to_fragment);
     m_dirty = false;
   }
 };
