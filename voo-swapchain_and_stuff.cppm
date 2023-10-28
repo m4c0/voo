@@ -62,6 +62,10 @@ public:
     return *m_rp;
   }
 
+  [[nodiscard]] constexpr auto aspect() const noexcept {
+    return static_cast<float>(m_ext.width) / static_cast<float>(m_ext.height);
+  }
+
   auto acquire_next_image() noexcept {
     vee::wait_and_reset_fence(*m_f);
     return m_idx = vee::acquire_next_image(*m_swc, *m_img_available_sema);
