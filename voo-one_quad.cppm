@@ -28,8 +28,16 @@ public:
     *static_cast<quad *>(*mem) = {};
   }
 
-  void cmd_bind_vertex_buffer(vee::command_buffer cb, unsigned idx) {
+  void cmd_bind_vertex_buffer(vee::command_buffer cb,
+                              unsigned idx) const noexcept {
     vee::cmd_bind_vertex_buffers(cb, idx, *m_qbuf);
+  }
+
+  auto vertex_input_bind() const noexcept {
+    return vee::vertex_input_bind(sizeof(float) * 2);
+  }
+  auto vertex_attribute(unsigned binding) const noexcept {
+    return vee::vertex_attribute_vec2(binding, 0);
   }
 };
 } // namespace voo
