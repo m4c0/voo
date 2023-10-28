@@ -1,5 +1,6 @@
 export module voo:swapchain_and_stuff;
 import :guards;
+import :device_and_queue;
 import hai;
 import vee;
 
@@ -25,6 +26,8 @@ export class swapchain_and_stuff {
   unsigned m_idx;
 
 public:
+  swapchain_and_stuff(const device_and_queue &dq)
+      : swapchain_and_stuff(dq.physical_device(), dq.surface()) {}
   swapchain_and_stuff(vee::physical_device pd, vee::surface::type s) {
     m_dimg = vee::create_depth_image(pd, s);
     m_dmem = vee::create_local_image_memory(pd, *m_dimg);
