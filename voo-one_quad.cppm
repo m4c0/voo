@@ -5,7 +5,8 @@ import vee;
 namespace {
 struct quad {
   static constexpr const auto v_count = 6;
-  float p[v_count][2]{
+  static constexpr const auto v_size = 2;
+  float p[v_count][v_size]{
       {0.0, 0.0}, {1.0, 1.0}, {1.0, 0.0},
 
       {1.0, 1.0}, {0.0, 0.0}, {0.0, 1.0},
@@ -28,13 +29,13 @@ public:
     *static_cast<quad *>(*mem) = {};
   }
 
-  void cmd_bind_vertex_buffer(vee::command_buffer cb,
-                              unsigned idx) const noexcept {
-    vee::cmd_bind_vertex_buffers(cb, idx, *m_qbuf);
+  void run(const cmd_render_pass &scb, unsigned idx) const noexcept {
+    vee::cmd_bind_vertex_buffers(*scb, idx, *m_qbuf);
+    vee::cmd_draw(*scb, quad::v_count);
   }
 
   auto vertex_input_bind() const noexcept {
-    return vee::vertex_input_bind(sizeof(float) * 2);
+    return vee::vertex_input_bind(sizeof(float) * quad::v_size);
   }
   auto vertex_attribute(unsigned binding) const noexcept {
     return vee::vertex_attribute_vec2(binding, 0);
