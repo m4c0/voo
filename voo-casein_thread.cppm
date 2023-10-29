@@ -24,9 +24,6 @@ public:
   }
 
   void resize_window(const casein::events::resize_window &e) override {
-    if ((*e).live)
-      return;
-
     m_resized = true;
   }
 
