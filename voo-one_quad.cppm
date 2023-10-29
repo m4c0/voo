@@ -29,9 +29,10 @@ public:
     *static_cast<quad *>(*mem) = {};
   }
 
-  void run(const cmd_render_pass &scb, unsigned idx) const noexcept {
+  void run(const cmd_render_pass &scb, unsigned idx,
+           unsigned inst = 1) const noexcept {
     vee::cmd_bind_vertex_buffers(*scb, idx, *m_qbuf);
-    vee::cmd_draw(*scb, quad::v_count);
+    vee::cmd_draw(*scb, quad::v_count, inst);
   }
 
   auto vertex_input_bind() const noexcept {
