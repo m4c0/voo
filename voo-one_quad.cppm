@@ -1,4 +1,5 @@
 export module voo:one_quad;
+import :device_and_queue;
 import :guards;
 import vee;
 
@@ -28,6 +29,8 @@ public:
     vee::mapmem mem{*m_qmem};
     *static_cast<quad *>(*mem) = {};
   }
+  explicit one_quad(const device_and_queue &dq)
+      : one_quad(dq.physical_device()) {}
 
   void run(const cmd_render_pass &scb, unsigned idx,
            unsigned inst = 1) const noexcept {
