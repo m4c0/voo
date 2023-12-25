@@ -42,8 +42,8 @@ public:
           vee::cmd_bind_gr_pipeline(cb, *gp);
           quad.run(scb, 0);
         }
-        sw.queue_submit(dq.queue(), cb);
-        sw.queue_present(dq.queue());
+        sw.queue_submit(dq, cb);
+        sw.queue_present(dq);
       }
 
       vee::device_wait_idle();
