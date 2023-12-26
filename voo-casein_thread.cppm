@@ -12,6 +12,14 @@ protected:
   [[nodiscard]] auto &resized() noexcept { return m_resized; }
   [[nodiscard]] constexpr auto native_ptr() const noexcept { return m_nptr; }
 
+  void extent_loop(auto fn) {
+    resized() = false;
+    while (!interrupted() && !resized()) {
+      fn();
+    }
+    vee::device_wait_idle();
+  }
+
   using thread::interrupted;
 
 public:
