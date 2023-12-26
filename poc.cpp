@@ -15,9 +15,11 @@ public:
     vee::command_buffer cb =
         vee::allocate_primary_command_buffer(dq.command_pool());
 
+    vee::pipeline_layout pl = vee::create_pipeline_layout();
+
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
-      vee::pipeline_layout pl = vee::create_pipeline_layout();
+
       auto gp = vee::create_graphics_pipeline({
           .pipeline_layout = *pl,
           .render_pass = sw.render_pass(),
@@ -33,20 +35,15 @@ public:
           },
       });
 
-      resized() = false;
-      while (!interrupted() && !resized()) {
+      extent_loop([&] {
         sw.acquire_next_image();
-        {
-          voo::cmd_buf_one_time_submit pcb{cb};
+        sw.one_time_submit(dq, cb, [&] {
           auto scb = sw.cmd_render_pass(cb);
           vee::cmd_bind_gr_pipeline(cb, *gp);
           quad.run(scb, 0);
-        }
-        sw.queue_submit(dq, cb);
+        });
         sw.queue_present(dq);
-      }
-
-      vee::device_wait_idle();
+      });
     }
   }
 };
