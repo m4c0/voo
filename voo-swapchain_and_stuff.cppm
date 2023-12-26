@@ -107,5 +107,14 @@ public:
   void queue_present(const device_and_queue &dq) const noexcept {
     queue_present(dq.queue());
   }
+
+  void one_time_submit(const device_and_queue &dq, vee::command_buffer cb,
+                       auto fn) const {
+    {
+      voo::cmd_buf_one_time_submit pcb{cb};
+      fn();
+    }
+    queue_submit(dq, cb);
+  }
 };
 } // namespace voo
