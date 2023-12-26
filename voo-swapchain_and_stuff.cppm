@@ -91,7 +91,7 @@ public:
         .signal_semaphore = *m_rnd_finished_sema,
     });
   }
-  void queue_submit(const voo::device_and_queue &dq,
+  void queue_submit(const device_and_queue &dq,
                     vee::command_buffer cb) const noexcept {
     queue_submit(dq.queue(), cb);
   }
@@ -104,7 +104,7 @@ public:
         .image_index = m_idx,
     });
   }
-  void queue_present(const voo::device_and_queue &dq) const noexcept {
+  void queue_present(const device_and_queue &dq) const noexcept {
     queue_present(dq.queue());
   }
 };
