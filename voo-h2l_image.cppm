@@ -1,4 +1,5 @@
 export module voo:h2l_image;
+import :device_and_queue;
 import :guards;
 import :host_buffer;
 import vee;
@@ -31,6 +32,8 @@ public:
     m_h = h;
     init(pd);
   }
+  explicit h2l_image(const voo::device_and_queue &dq, int w, int h)
+      : h2l_image{dq.physical_device(), w, h} {}
 
   [[nodiscard]] auto mapmem() {
     m_dirty = true;
