@@ -11,6 +11,11 @@ public:
   }
   ~cmd_buf_one_time_submit() { vee::end_cmd_buf(m_cb); }
 
+  cmd_buf_one_time_submit(const cmd_buf_one_time_submit &) = delete;
+  cmd_buf_one_time_submit(cmd_buf_one_time_submit &&) = delete;
+  cmd_buf_one_time_submit &operator=(const cmd_buf_one_time_submit &) = delete;
+  cmd_buf_one_time_submit &operator=(cmd_buf_one_time_submit &&) = delete;
+
   [[nodiscard]] constexpr auto operator*() const noexcept { return m_cb; }
 };
 
@@ -25,6 +30,11 @@ public:
     vee::cmd_set_viewport(m_cb, rpb.extent);
   }
   ~cmd_render_pass() { vee::cmd_end_render_pass(m_cb); }
+
+  cmd_render_pass(const cmd_render_pass &) = delete;
+  cmd_render_pass(cmd_render_pass &&) = delete;
+  cmd_render_pass &operator=(const cmd_render_pass &) = delete;
+  cmd_render_pass &operator=(cmd_render_pass &&) = delete;
 
   [[nodiscard]] constexpr auto operator*() const noexcept { return m_cb; }
 };
