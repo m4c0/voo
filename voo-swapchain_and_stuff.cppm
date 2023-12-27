@@ -71,9 +71,9 @@ public:
     return m_idx = vee::acquire_next_image(*m_swc, *m_img_available_sema);
   }
 
-  auto cmd_render_pass(vee::command_buffer cb) const noexcept {
+  auto cmd_render_pass(const cmd_buf_one_time_submit &pcb) const noexcept {
     return voo::cmd_render_pass({
-        .command_buffer = cb,
+        .command_buffer = *pcb,
         .render_pass = render_pass(),
         .framebuffer = framebuffer(),
         .extent = extent(),
@@ -112,7 +112,7 @@ public:
                        auto fn) const {
     {
       voo::cmd_buf_one_time_submit pcb{cb};
-      fn();
+      fn(pcb);
     }
     queue_submit(dq, cb);
   }

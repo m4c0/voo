@@ -37,9 +37,9 @@ public:
 
       extent_loop([&] {
         sw.acquire_next_image();
-        sw.one_time_submit(dq, cb, [&] {
-          auto scb = sw.cmd_render_pass(cb);
-          vee::cmd_bind_gr_pipeline(cb, *gp);
+        sw.one_time_submit(dq, cb, [&](auto &pcb) {
+          auto scb = sw.cmd_render_pass(pcb);
+          vee::cmd_bind_gr_pipeline(*scb, *gp);
           quad.run(scb, 0);
         });
         sw.queue_present(dq);
