@@ -5,6 +5,9 @@ import hai;
 import vee;
 
 namespace voo {
+template <typename T, typename A>
+concept is_fn_taking_const_ref = requires(T t, const A &a) { t(a); };
+
 export class swapchain_and_stuff {
   // Depth buffer
   vee::image m_dimg;
@@ -108,10 +111,11 @@ public:
     queue_present(dq.queue());
   }
 
-  void one_time_submit(const device_and_queue &dq, vee::command_buffer cb,
-                       auto fn) const {
+  void one_time_submit(
+      const device_and_queue &dq, vee::command_buffer cb,
+      is_fn_taking_const_ref<cmd_buf_one_time_submit> auto fn) const {
     {
-      voo::cmd_buf_one_time_submit pcb{cb};
+      cmd_buf_one_time_submit pcb{cb};
       fn(pcb);
     }
     queue_submit(dq, cb);
