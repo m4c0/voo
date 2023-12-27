@@ -1,5 +1,6 @@
 export module voo:h2l_image;
 import :guards;
+import :host_buffer;
 import vee;
 
 namespace voo {
@@ -7,8 +8,7 @@ export class h2l_image {
   unsigned m_w;
   unsigned m_h;
 
-  vee::buffer m_sbuf;
-  vee::device_memory m_smem;
+  host_buffer m_buf;
 
   vee::image m_img;
   vee::device_memory m_mem;
@@ -17,10 +17,6 @@ export class h2l_image {
   bool m_dirty{true};
 
   void init(vee::physical_device pd) {
-    m_sbuf = vee::create_transfer_src_buffer(m_w * m_h * 4);
-    m_smem = vee::create_host_buffer_memory(pd, *m_sbuf);
-    vee::bind_buffer_memory(*m_sbuf, *m_smem);
-
     m_img = vee::create_srgba_image({m_w, m_h});
     m_mem = vee::create_local_image_memory(pd, *m_img);
     vee::bind_image_memory(*m_img, *m_mem);
@@ -29,7 +25,8 @@ export class h2l_image {
 
 public:
   h2l_image() = default;
-  explicit h2l_image(vee::physical_device pd, int w, int h) {
+  explicit h2l_image(vee::physical_device pd, int w, int h)
+      : m_buf{pd, w * h * 4} {
     m_w = w;
     m_h = h;
     init(pd);
@@ -37,7 +34,7 @@ public:
 
   [[nodiscard]] auto mapmem() {
     m_dirty = true;
-    return vee::mapmem{*m_smem};
+    return m_buf.mapmem();
   }
 
   [[nodiscard]] auto iv() const noexcept { return *m_iv; }
@@ -47,7 +44,7 @@ public:
       return;
 
     vee::cmd_pipeline_barrier(*cb, *m_img, vee::from_host_to_transfer);
-    vee::cmd_copy_buffer_to_image(*cb, {m_w, m_h}, *m_sbuf, *m_img);
+    vee::cmd_copy_buffer_to_image(*cb, {m_w, m_h}, m_buf.buffer(), *m_img);
     vee::cmd_pipeline_barrier(*cb, *m_img, vee::from_transfer_to_fragment);
     m_dirty = false;
   }
