@@ -42,8 +42,8 @@ public:
   explicit h2l_buffer(const voo::device_and_queue &dq, int sz)
       : h2l_buffer{dq.physical_device(), dq.command_pool(), sz} {}
 
-  [[nodiscard]] auto mapmem() {
-    vee::wait_and_reset_fence(*m_fence);
+  [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
+    vee::wait_and_reset_fence(*m_fence, timeout_ms);
     return dirt_guard{m_hbuf.memory(), &m_dirty};
   }
 
