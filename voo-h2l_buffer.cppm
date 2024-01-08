@@ -2,9 +2,21 @@ export module voo:h2l_buffer;
 import :device_and_queue;
 import :guards;
 import :host_buffer;
+import traits;
 import vee;
 
 namespace voo {
+class dirt_guard {
+  vee::mapmem m_mem;
+  bool *m_dirty;
+
+public:
+  dirt_guard(vee::device_memory::type m, bool *flag)
+      : m_mem{vee::mapmem{m}}, m_dirty{flag} {}
+  ~dirt_guard() { *m_dirty = true; }
+
+  [[nodiscard]] auto operator*() { return *m_mem; }
+};
 export class h2l_buffer {
   host_buffer m_hbuf;
 
@@ -32,8 +44,7 @@ public:
 
   [[nodiscard]] auto mapmem() {
     vee::wait_and_reset_fence(*m_fence);
-    m_dirty = true;
-    return m_hbuf.mapmem();
+    return dirt_guard{m_hbuf.memory(), &m_dirty};
   }
 
   [[nodiscard]] auto buffer() const noexcept { return *m_buf; }

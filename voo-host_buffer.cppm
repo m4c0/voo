@@ -18,6 +18,7 @@ public:
       : host_buffer{dq.physical_device(), sz} {}
 
   [[nodiscard]] auto buffer() const noexcept { return *m_buf; }
+  [[nodiscard]] auto memory() const noexcept { return *m_mem; }
   [[nodiscard]] auto mapmem() { return vee::mapmem{*m_mem}; }
 };
 } // namespace voo
