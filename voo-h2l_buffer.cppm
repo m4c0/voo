@@ -11,6 +11,7 @@ export class h2l_buffer {
   vee::buffer m_buf;
   vee::device_memory m_mem;
   vee::command_buffer m_cb;
+  vee::fence m_fence;
 
   bool m_dirty{true};
   int m_size{};
@@ -20,7 +21,7 @@ public:
   explicit h2l_buffer(vee::physical_device pd, vee::command_pool::type cp,
                       int sz)
       : m_hbuf{pd, sz}, m_cb{vee::allocate_primary_command_buffer(cp)},
-        m_size{sz} {
+        m_fence{vee::create_fence_signaled()}, m_size{sz} {
     m_buf =
         vee::create_buffer(sz, vee::vertex_buffer, vee::transfer_dst_buffer);
     m_mem = vee::create_local_buffer_memory(pd, *m_buf);
@@ -30,6 +31,7 @@ public:
       : h2l_buffer{dq.physical_device(), dq.command_pool(), sz} {}
 
   [[nodiscard]] auto mapmem() {
+    vee::wait_and_reset_fence(*m_fence);
     m_dirty = true;
     return m_hbuf.mapmem();
   }
@@ -53,6 +55,7 @@ public:
     }
     vee::queue_submit({
         .queue = q,
+        .fence = *m_fence,
         .command_buffer = m_cb,
     });
     m_dirty = false;
