@@ -33,27 +33,29 @@ public:
 
   [[nodiscard]] auto buffer() const noexcept { return *m_buf; }
 
-  void run(const cmd_buf_one_time_submit &cb) {
-    if (!m_dirty)
-      return;
-
-    vee::cmd_pipeline_barrier(*cb, *m_buf, vee::from_host_to_transfer);
-    vee::cmd_copy_buffer(*cb, m_hbuf.buffer(), *m_buf, m_size);
-    vee::cmd_pipeline_barrier(*cb, *m_buf, vee::from_transfer_to_vertex);
-    m_dirty = false;
+  void cmd_bind_vertex_buffer(const voo::cmd_render_pass &scb,
+                              unsigned binding) {
+    vee::cmd_bind_vertex_buffers(*scb, binding, *m_buf);
   }
+
   void submit(vee::command_buffer cb, const vee::queue &q) {
     if (!m_dirty)
       return;
 
     {
       voo::cmd_buf_one_time_submit pcb{cb};
-      run(pcb);
+      vee::cmd_pipeline_barrier(cb, *m_buf, vee::from_host_to_transfer);
+      vee::cmd_copy_buffer(cb, m_hbuf.buffer(), *m_buf, m_size);
+      vee::cmd_pipeline_barrier(cb, *m_buf, vee::from_transfer_to_vertex);
     }
     vee::queue_submit({
         .queue = q,
         .command_buffer = cb,
     });
+    m_dirty = false;
+  }
+  void submit(vee::command_buffer cb, const voo::device_and_queue &dq) {
+    submit(cb, dq.queue());
   }
 };
 } // namespace voo
