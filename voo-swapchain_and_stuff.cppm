@@ -26,11 +26,15 @@ export class swapchain_and_stuff {
   hai::array<vee::image_view> m_civs;
   hai::array<vee::framebuffer> m_fbs;
 
+  vee::command_buffer m_cb;
+
   unsigned m_idx;
 
 public:
   swapchain_and_stuff(const device_and_queue &dq)
-      : swapchain_and_stuff(dq.physical_device(), dq.surface()) {}
+      : swapchain_and_stuff(dq.physical_device(), dq.surface()) {
+    m_cb = vee::allocate_primary_command_buffer(dq.command_pool());
+  }
   swapchain_and_stuff(vee::physical_device pd, vee::surface::type s) {
     m_dimg = vee::create_depth_image(pd, s);
     m_dmem = vee::create_local_image_memory(pd, *m_dimg);
@@ -99,6 +103,10 @@ public:
     queue_submit(dq.queue(), cb);
   }
 
+  void queue_submit(const device_and_queue &dq) const noexcept {
+    queue_submit(dq.queue(), m_cb);
+  }
+
   void queue_present(vee::queue q) const noexcept {
     vee::queue_present({
         .queue = q,
@@ -119,6 +127,11 @@ public:
       fn(pcb);
     }
     queue_submit(dq, cb);
+  }
+  void one_time_submit(
+      const device_and_queue &dq,
+      is_fn_taking_const_ref<cmd_buf_one_time_submit> auto fn) const {
+    one_time_submit(dq, m_cb, fn);
   }
 };
 } // namespace voo

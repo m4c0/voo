@@ -22,8 +22,6 @@ public:
     voo::device_and_queue dq{"winnipeg", native_ptr()};
 
     voo::one_quad quad{dq};
-    vee::command_buffer cb =
-        vee::allocate_primary_command_buffer(dq.command_pool());
 
     vee::pipeline_layout pl = vee::create_pipeline_layout();
 
@@ -55,7 +53,7 @@ public:
 
         insts.submit(dq);
 
-        sw.one_time_submit(dq, cb, [&](auto &pcb) {
+        sw.one_time_submit(dq, [&](auto &pcb) {
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_bind_gr_pipeline(*scb, *gp);
           insts.cmd_bind_vertex_buffer(scb, 1);
