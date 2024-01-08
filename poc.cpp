@@ -64,6 +64,8 @@ public:
         sw.queue_present(dq);
       });
     }
+
+    m_insts = nullptr;
   }
 };
 
@@ -82,9 +84,12 @@ public:
       if (!buf)
         continue;
 
-      auto m = buf->mapmem();
-      static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
-      static_cast<inst *>(*m)[1] = {-1, -1};
+      try {
+        auto m = buf->mapmem(100);
+        static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
+        static_cast<inst *>(*m)[1] = {-1, -1};
+      } catch (...) {
+      }
     }
   }
 };
