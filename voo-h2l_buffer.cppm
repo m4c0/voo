@@ -42,5 +42,18 @@ public:
     vee::cmd_pipeline_barrier(*cb, *m_buf, vee::from_transfer_to_vertex);
     m_dirty = false;
   }
+  void submit(vee::command_buffer cb, const vee::queue &q) {
+    if (!m_dirty)
+      return;
+
+    {
+      voo::cmd_buf_one_time_submit pcb{cb};
+      run(pcb);
+    }
+    vee::queue_submit({
+        .queue = q,
+        .command_buffer = cb,
+    });
+  }
 };
 } // namespace voo
