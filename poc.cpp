@@ -18,8 +18,6 @@ public:
     voo::one_quad quad{dq};
     vee::command_buffer cb =
         vee::allocate_primary_command_buffer(dq.command_pool());
-    vee::command_buffer cb1 =
-        vee::allocate_primary_command_buffer(dq.command_pool());
 
     vee::pipeline_layout pl = vee::create_pipeline_layout();
 
@@ -47,19 +45,20 @@ public:
 
       {
         auto m = insts.mapmem();
-        *static_cast<inst *>(*m) = {-0.5, -0.5};
+        static_cast<inst *>(*m)[0] = {-1, -1};
+        static_cast<inst *>(*m)[1] = {0, -0};
       }
 
       extent_loop([&] {
         sw.acquire_next_image();
 
-        insts.submit(cb1, dq);
+        insts.submit(dq);
 
         sw.one_time_submit(dq, cb, [&](auto &pcb) {
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_bind_gr_pipeline(*scb, *gp);
           insts.cmd_bind_vertex_buffer(scb, 1);
-          quad.run(scb, 0);
+          quad.run(scb, 0, 2);
         });
         sw.queue_present(dq);
       });
