@@ -19,6 +19,23 @@ public:
   [[nodiscard]] constexpr auto operator*() const noexcept { return m_cb; }
 };
 
+export class cmd_buf_sim_use {
+  vee::command_buffer m_cb;
+
+public:
+  explicit cmd_buf_sim_use(vee::command_buffer cb) : m_cb{cb} {
+    vee::begin_cmd_buf_sim_use(cb);
+  }
+  ~cmd_buf_sim_use() { vee::end_cmd_buf(m_cb); }
+
+  cmd_buf_sim_use(const cmd_buf_sim_use &) = delete;
+  cmd_buf_sim_use(cmd_buf_sim_use &&) = delete;
+  cmd_buf_sim_use &operator=(const cmd_buf_sim_use &) = delete;
+  cmd_buf_sim_use &operator=(cmd_buf_sim_use &&) = delete;
+
+  [[nodiscard]] constexpr auto operator*() const noexcept { return m_cb; }
+};
+
 export class cmd_render_pass {
   vee::command_buffer m_cb;
 

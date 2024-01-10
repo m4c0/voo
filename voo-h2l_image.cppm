@@ -36,11 +36,16 @@ public:
     m_w = w;
     m_h = h;
     init(pd);
+
+    voo::cmd_buf_sim_use pcb{m_cb};
+    vee::cmd_pipeline_barrier(*pcb, *m_img, vee::from_host_to_transfer);
+    vee::cmd_copy_buffer_to_image(*pcb, {m_w, m_h}, m_buf.buffer(), *m_img);
+    vee::cmd_pipeline_barrier(*pcb, *m_img, vee::from_transfer_to_fragment);
   }
   explicit h2l_image(const voo::device_and_queue &dq, int w, int h)
       : h2l_image{dq.physical_device(), dq.command_pool(), w, h} {}
 
-  [[nodiscard]] auto mapmem() {
+  [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
     m_fence.wait_and_reset();
     return m_dirty.guard(m_buf.memory());
   }
@@ -53,12 +58,6 @@ public:
     if (!m_dirty.get_and_clear())
       return;
 
-    {
-      voo::cmd_buf_one_time_submit pcb{m_cb};
-      vee::cmd_pipeline_barrier(*pcb, *m_img, vee::from_host_to_transfer);
-      vee::cmd_copy_buffer_to_image(*pcb, {m_w, m_h}, m_buf.buffer(), *m_img);
-      vee::cmd_pipeline_barrier(*pcb, *m_img, vee::from_transfer_to_fragment);
-    }
     vee::queue_submit({
         .queue = q,
         .fence = *m_fence,

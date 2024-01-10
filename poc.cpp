@@ -56,7 +56,7 @@ public:
         sw.one_time_submit(dq, [&](auto &pcb) {
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_bind_gr_pipeline(*scb, *gp);
-          insts.cmd_bind_vertex_buffer(scb, 1);
+          vee::cmd_bind_vertex_buffers(*scb, 1, insts.buffer());
           quad.run(scb, 0, 2);
         });
         sw.queue_present(dq);
