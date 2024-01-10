@@ -1,59 +1,39 @@
 export module voo:h2l_buffer;
 import :device_and_queue;
-import :dirty_flag;
-import :fence;
 import :guards;
 import :host_buffer;
-import traits;
 import vee;
 
 namespace voo {
 export class h2l_buffer {
-  host_buffer m_hbuf;
-  dirty_flag m_dirty{};
-  fence m_fence{};
-  vee::command_buffer m_cb;
+  fenced_host_buffer m_hbuf;
 
   vee::buffer m_buf;
   vee::device_memory m_mem;
-
-  unsigned m_size{};
 
 public:
   h2l_buffer() = default;
   explicit h2l_buffer(vee::physical_device pd, vee::command_pool::type cp,
                       int sz)
-      : m_buf{pd, sz}, m_fence{fence::signaled{}},
-        m_cb{vee::allocate_primary_command_buffer(cp)} {
-    m_size = sz;
+      : m_hbuf{pd, cp, sz} {
     m_buf =
         vee::create_buffer(sz, vee::vertex_buffer, vee::transfer_dst_buffer);
     m_mem = vee::create_local_buffer_memory(pd, *m_buf);
     vee::bind_buffer_memory(*m_buf, *m_mem);
 
-    voo::cmd_buf_sim_use pcb{m_cb};
+    voo::cmd_buf_sim_use pcb{m_hbuf.cmd_buf()};
     vee::cmd_pipeline_barrier(*pcb, *m_buf, vee::from_host_to_transfer);
-    vee::cmd_copy_buffer(*pcb, m_hbuf.buffer(), *m_buf, m_size);
+    vee::cmd_copy_buffer(*pcb, m_hbuf.buffer(), *m_buf, sz);
     vee::cmd_pipeline_barrier(*pcb, *m_buf, vee::from_transfer_to_vertex);
   }
   explicit h2l_buffer(const voo::device_and_queue &dq, int sz)
       : h2l_buffer{dq.physical_device(), dq.command_pool(), sz} {}
 
   [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
-    m_fence.wait_and_reset(timeout_ms);
-    return m_dirty.guard(m_hbuf.memory());
+    return m_hbuf.mapmem(timeout_ms);
   }
 
-  void submit(const vee::queue &q) {
-    if (!m_dirty.get_and_clear())
-      return;
-
-    vee::queue_submit({
-        .queue = q,
-        .fence = *m_fence,
-        .command_buffer = m_cb,
-    });
-  }
+  void submit(const vee::queue &q) { m_hbuf.submit(q); }
   void submit(const voo::device_and_queue &dq) { submit(dq.queue()); }
 
   [[nodiscard]] auto buffer() const noexcept { return *m_buf; }

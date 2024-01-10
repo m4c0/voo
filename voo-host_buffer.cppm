@@ -1,5 +1,7 @@
 export module voo:host_buffer;
 import :device_and_queue;
+import :dirty_flag;
+import :fence;
 import vee;
 
 namespace voo {
@@ -20,5 +22,41 @@ public:
   [[nodiscard]] auto buffer() const noexcept { return *m_buf; }
   [[nodiscard]] auto memory() const noexcept { return *m_mem; }
   [[nodiscard]] auto mapmem() { return vee::mapmem{*m_mem}; }
+};
+
+class fenced_host_buffer {
+  host_buffer m_hbuf;
+  dirty_flag m_dirty{};
+  fence m_fence{};
+  vee::command_buffer m_cb;
+
+public:
+  fenced_host_buffer() = default;
+  fenced_host_buffer(vee::physical_device pd, vee::command_pool::type cp,
+                     int sz)
+      : m_hbuf{pd, sz}, m_fence{fence::signaled{}},
+        m_cb{vee::allocate_primary_command_buffer(cp)} {}
+
+  [[nodiscard]] constexpr auto buffer() const noexcept {
+    return m_hbuf.buffer();
+  }
+  [[nodiscard]] constexpr auto cmd_buf() const noexcept { return m_cb; }
+
+  [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
+    m_fence.wait_and_reset(timeout_ms);
+    return m_dirty.guard(m_hbuf.memory());
+  }
+
+  void submit(const vee::queue &q) {
+    if (!m_dirty.get_and_clear())
+      return;
+
+    vee::queue_submit({
+        .queue = q,
+        .fence = *m_fence,
+        .command_buffer = m_cb,
+    });
+  }
+  void submit(const voo::device_and_queue &dq) { submit(dq.queue()); }
 };
 } // namespace voo
