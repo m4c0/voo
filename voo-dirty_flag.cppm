@@ -14,7 +14,7 @@ public:
   [[nodiscard]] auto operator*() { return *m_mem; }
 };
 class dirty_flag {
-  bool m_dirty{true};
+  bool m_dirty{false};
 
 public:
   [[nodiscard]] constexpr bool get_and_clear() noexcept {

@@ -48,6 +48,7 @@ public:
   }
 
   void submit(const vee::queue &q) {
+    // TODO: consider "get" the fence status instead of a bool flag
     if (!m_dirty.get_and_clear())
       return;
 
