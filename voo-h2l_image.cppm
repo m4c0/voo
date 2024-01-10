@@ -19,7 +19,7 @@ public:
   h2l_image() = default;
   explicit h2l_image(vee::physical_device pd, vee::command_pool::type cp, int w,
                      int h)
-      : m_hbuf{pd, w * h * 4} {
+      : m_hbuf{pd, cp, w * h * 4} {
     m_w = w;
     m_h = h;
     m_img = vee::create_srgba_image({m_w, m_h});
