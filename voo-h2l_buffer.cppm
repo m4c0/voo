@@ -1,6 +1,7 @@
 export module voo:h2l_buffer;
 import :device_and_queue;
 import :dirty_flag;
+import :fence;
 import :guards;
 import :host_buffer;
 import traits;
@@ -14,7 +15,7 @@ export class h2l_buffer {
   vee::buffer m_buf;
   vee::device_memory m_mem;
   vee::command_buffer m_cb;
-  vee::fence m_fence;
+  fence m_fence{};
 
   int m_size{};
 
@@ -23,7 +24,7 @@ public:
   explicit h2l_buffer(vee::physical_device pd, vee::command_pool::type cp,
                       int sz)
       : m_hbuf{pd, sz}, m_cb{vee::allocate_primary_command_buffer(cp)},
-        m_fence{vee::create_fence_signaled()}, m_size{sz} {
+        m_fence{fence::signaled{}}, m_size{sz} {
     m_buf =
         vee::create_buffer(sz, vee::vertex_buffer, vee::transfer_dst_buffer);
     m_mem = vee::create_local_buffer_memory(pd, *m_buf);
@@ -33,7 +34,7 @@ public:
       : h2l_buffer{dq.physical_device(), dq.command_pool(), sz} {}
 
   [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
-    vee::wait_and_reset_fence(*m_fence, timeout_ms);
+    m_fence.wait_and_reset(timeout_ms);
     return m_dirty.guard(m_hbuf.memory());
   }
 

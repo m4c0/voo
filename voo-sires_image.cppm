@@ -10,11 +10,13 @@ export class sires_image {
   h2l_image m_img;
 
 public:
-  explicit sires_image(vee::physical_device pd) : m_img{pd, 16, 16} {}
-  sires_image(const char *file, vee::physical_device pd) {
+  explicit sires_image(vee::physical_device pd, vee::command_pool::type cp)
+      : m_img{pd, cp, 16, 16} {}
+  sires_image(const char *file, vee::physical_device pd,
+              vee::command_pool::type cp) {
     stbi::load(file)
-        .map([this, pd](auto &&img) {
-          m_img = h2l_image{pd, img.width, img.height};
+        .map([this, pd, cp](auto &&img) {
+          m_img = h2l_image{pd, cp, img.width, img.height};
 
           auto m = m_img.mapmem();
           auto *c = static_cast<unsigned char *>(*m);
@@ -28,9 +30,6 @@ public:
         });
   }
 
-  [[nodiscard]] auto iv() const noexcept { return m_img.iv(); }
-
-  void run(const cmd_buf_one_time_submit &cb) { m_img.run(cb); }
+  [[nodiscard]] constexpr auto &image() noexcept { return m_img; }
 };
-
 } // namespace voo
