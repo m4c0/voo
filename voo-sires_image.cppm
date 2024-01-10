@@ -16,7 +16,7 @@ public:
         .map([this, pd](auto &&img) {
           m_img = h2l_image{pd, img.width, img.height};
 
-          vee::mapmem m = m_img.mapmem();
+          auto m = m_img.mapmem();
           auto *c = static_cast<unsigned char *>(*m);
           for (auto i = 0; i < img.width * img.height * 4; i++) {
             c[i] = (*img.data)[i];

@@ -1,31 +1,21 @@
 export module voo:h2l_buffer;
 import :device_and_queue;
+import :dirty_flag;
 import :guards;
 import :host_buffer;
 import traits;
 import vee;
 
 namespace voo {
-class dirt_guard {
-  vee::mapmem m_mem;
-  bool *m_dirty;
-
-public:
-  dirt_guard(vee::device_memory::type m, bool *flag)
-      : m_mem{vee::mapmem{m}}, m_dirty{flag} {}
-  ~dirt_guard() { *m_dirty = true; }
-
-  [[nodiscard]] auto operator*() { return *m_mem; }
-};
 export class h2l_buffer {
   host_buffer m_hbuf;
+  dirty_flag m_dirty{};
 
   vee::buffer m_buf;
   vee::device_memory m_mem;
   vee::command_buffer m_cb;
   vee::fence m_fence;
 
-  bool m_dirty{true};
   int m_size{};
 
 public:
@@ -44,7 +34,7 @@ public:
 
   [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
     vee::wait_and_reset_fence(*m_fence, timeout_ms);
-    return dirt_guard{m_hbuf.memory(), &m_dirty};
+    return m_dirty.guard(m_hbuf.memory());
   }
 
   [[nodiscard]] auto buffer() const noexcept { return *m_buf; }
@@ -55,7 +45,7 @@ public:
   }
 
   void submit(const vee::queue &q) {
-    if (!m_dirty)
+    if (!m_dirty.get_and_clear())
       return;
 
     {
@@ -69,7 +59,6 @@ public:
         .fence = *m_fence,
         .command_buffer = m_cb,
     });
-    m_dirty = false;
   }
   void submit(const voo::device_and_queue &dq) { submit(dq.queue()); }
 };
