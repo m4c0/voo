@@ -18,14 +18,16 @@ export class h2l_image {
 public:
   h2l_image() = default;
   explicit h2l_image(vee::physical_device pd, vee::command_pool::type cp, int w,
-                     int h, vee::image_format fmt = vee::image_format_srgba)
+                     int h, bool rgba = true)
       : m_hbuf{pd, cp, w * h * 4} {
     m_w = w;
     m_h = h;
-    m_img = vee::create_image({m_w, m_h}, fmt);
+    m_img = vee::create_image({m_w, m_h}, rgba ? vee::image_format_srgba
+                                               : vee::image_format_r8);
     m_mem = vee::create_local_image_memory(pd, *m_img);
     vee::bind_image_memory(*m_img, *m_mem);
-    m_iv = vee::create_srgba_image_view(*m_img);
+    m_iv = rgba ? vee::create_srgba_image_view(*m_img)
+                : vee::create_r8_image_view(*m_img);
 
     voo::cmd_buf_sim_use pcb{m_hbuf.cmd_buf()};
     vee::cmd_pipeline_barrier(*pcb, *m_img, vee::from_host_to_transfer);
@@ -33,8 +35,8 @@ public:
     vee::cmd_pipeline_barrier(*pcb, *m_img, vee::from_transfer_to_fragment);
   }
   explicit h2l_image(const voo::device_and_queue &dq, int w, int h,
-                     vee::image_format fmt = vee::image_format_srgba)
-      : h2l_image{dq.physical_device(), dq.command_pool(), w, h, fmt} {}
+                     bool rgba = true)
+      : h2l_image{dq.physical_device(), dq.command_pool(), w, h, rgba} {}
 
   [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
     return m_hbuf.mapmem(timeout_ms);
