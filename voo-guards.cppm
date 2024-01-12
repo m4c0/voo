@@ -17,6 +17,11 @@ public:
   cmd_buf_one_time_submit &operator=(cmd_buf_one_time_submit &&) = delete;
 
   [[nodiscard]] constexpr auto operator*() const noexcept { return m_cb; }
+
+  static void build(vee::command_buffer cb, auto &&fn) {
+    cmd_buf_one_time_submit pcb{cb};
+    fn(pcb);
+  }
 };
 
 export class cmd_buf_sim_use {
@@ -34,6 +39,11 @@ public:
   cmd_buf_sim_use &operator=(cmd_buf_sim_use &&) = delete;
 
   [[nodiscard]] constexpr auto operator*() const noexcept { return m_cb; }
+
+  static void build(vee::command_buffer cb, auto &&fn) {
+    cmd_buf_sim_use pcb{cb};
+    fn(pcb);
+  }
 };
 
 export class cmd_render_pass {
@@ -54,5 +64,10 @@ public:
   cmd_render_pass &operator=(cmd_render_pass &&) = delete;
 
   [[nodiscard]] constexpr auto operator*() const noexcept { return m_cb; }
+
+  static void build(const vee::render_pass_begin &rbp, auto &&fn) {
+    cmd_render_pass pcb{rbp};
+    fn(pcb);
+  }
 };
 } // namespace voo
