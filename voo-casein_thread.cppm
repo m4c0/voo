@@ -1,4 +1,6 @@
 export module voo:casein_thread;
+import :device_and_queue;
+import :swapchain_and_stuff;
 import casein;
 import hai;
 import mtx;
@@ -23,6 +25,14 @@ protected:
       fn();
     }
     vee::device_wait_idle();
+  }
+  void extent_loop(const device_and_queue &dq, swapchain_and_stuff &sw,
+                   auto fn) {
+    extent_loop([&] {
+      sw.acquire_next_image();
+      fn();
+      sw.queue_present(dq);
+    });
   }
 
   [[nodiscard]] auto wait_init() { return mtx::lock{&m_mutex}; }
