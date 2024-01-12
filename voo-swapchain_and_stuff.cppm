@@ -92,6 +92,11 @@ public:
   auto cmd_buf_render_pass_continue(vee::command_buffer cb) const noexcept {
     return voo::cmd_buf_render_pass_continue(cb, render_pass(), extent());
   }
+  void cmd_buf_render_pass_continue(vee::command_buffer cb,
+                                    auto &&fn) const noexcept {
+    auto cbg = cmd_buf_render_pass_continue(cb);
+    fn(cbg);
+  }
 
   void queue_submit(vee::queue q, vee::command_buffer cb) const noexcept {
     vee::queue_submit({
