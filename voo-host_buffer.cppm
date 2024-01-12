@@ -43,6 +43,7 @@ public:
   [[nodiscard]] constexpr auto cmd_buf() const noexcept { return m_cb; }
 
   [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
+    // TODO: split "wait" and "reset", call "reset" after memory is released
     m_fence.wait_and_reset(timeout_ms);
     return m_dirty.guard(m_hbuf.memory());
   }
