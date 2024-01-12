@@ -70,4 +70,28 @@ public:
     fn(pcb);
   }
 };
+
+export class cmd_buf_render_pass_continue {
+  vee::command_buffer m_cb;
+
+public:
+  explicit cmd_buf_render_pass_continue(vee::command_buffer cb,
+                                        vee::render_pass::type rp,
+                                        vee::extent extent)
+      : m_cb{cb} {
+    vee::begin_cmd_buf_render_pass_continue(m_cb, rp);
+    vee::cmd_set_scissor(m_cb, extent);
+    vee::cmd_set_viewport(m_cb, extent);
+  }
+  ~cmd_buf_render_pass_continue() { vee::end_cmd_buf(m_cb); }
+
+  cmd_buf_render_pass_continue(const cmd_buf_render_pass_continue &) = delete;
+  cmd_buf_render_pass_continue(cmd_buf_render_pass_continue &&) = delete;
+  cmd_buf_render_pass_continue &
+  operator=(const cmd_buf_render_pass_continue &) = delete;
+  cmd_buf_render_pass_continue &
+  operator=(cmd_buf_render_pass_continue &&) = delete;
+
+  [[nodiscard]] constexpr auto operator*() const noexcept { return m_cb; }
+};
 } // namespace voo

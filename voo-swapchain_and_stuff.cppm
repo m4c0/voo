@@ -88,6 +88,9 @@ public:
         .use_secondary_cmd_buf = false,
     });
   }
+  auto cmd_buf_render_pass_continue(vee::command_buffer cb) const noexcept {
+    return voo::cmd_buf_render_pass_continue(cb, render_pass(), extent());
+  }
 
   void queue_submit(vee::queue q, vee::command_buffer cb) const noexcept {
     vee::queue_submit({
