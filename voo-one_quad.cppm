@@ -32,10 +32,14 @@ public:
   explicit one_quad(const device_and_queue &dq)
       : one_quad(dq.physical_device()) {}
 
+  void run(vee::command_buffer cb, unsigned idx,
+           unsigned inst = 1) const noexcept {
+    vee::cmd_bind_vertex_buffers(cb, idx, *m_qbuf);
+    vee::cmd_draw(cb, quad::v_count, inst);
+  }
   void run(const cmd_render_pass &scb, unsigned idx,
            unsigned inst = 1) const noexcept {
-    vee::cmd_bind_vertex_buffers(*scb, idx, *m_qbuf);
-    vee::cmd_draw(*scb, quad::v_count, inst);
+    run(*scb, idx, inst);
   }
 
   auto vertex_input_bind() const noexcept {
