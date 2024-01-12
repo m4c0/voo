@@ -1,5 +1,7 @@
 export module voo:casein_thread;
 import casein;
+import hai;
+import mtx;
 import sith;
 import vee;
 
@@ -7,6 +9,9 @@ namespace voo {
 export class casein_thread : sith::thread, public casein::handler {
   casein::native_handle_t m_nptr{};
   volatile bool m_resized{};
+
+  mtx::mutex m_mutex{};
+  hai::uptr<mtx::lock> m_lock{new mtx::lock{&m_mutex}};
 
 protected:
   [[nodiscard]] auto &resized() noexcept { return m_resized; }
@@ -19,6 +24,9 @@ protected:
     }
     vee::device_wait_idle();
   }
+
+  [[nodiscard]] auto wait_init() { return mtx::lock{&m_mutex}; }
+  void release_init_lock() { m_lock = {}; }
 
   using thread::interrupted;
 
