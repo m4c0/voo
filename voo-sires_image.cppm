@@ -9,7 +9,7 @@ namespace voo {
 export auto load_sires_image(const char *file, vee::physical_device pd,
                              vee::command_pool::type cp) {
   return stbi::load(file)
-      .map([pd, cp](auto &&img) {
+      .map([file, pd, cp](auto &&img) {
         auto m_img = h2l_image{pd, cp, img.width, img.height};
 
         auto m = m_img.mapmem();
@@ -18,6 +18,8 @@ export auto load_sires_image(const char *file, vee::physical_device pd,
           c[i] = (*img.data)[i];
         }
 
+        silog::log(silog::info, "Loaded %dx%d image [%s]", img.width,
+                   img.height, file);
         return m_img;
       })
       .take([file](auto msg) {
