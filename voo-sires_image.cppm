@@ -10,7 +10,9 @@ export auto load_sires_image(const char *file, vee::physical_device pd,
                              vee::command_pool::type cp) {
   return stbi::load(file)
       .map([file, pd, cp](auto &&img) {
-        auto m_img = h2l_image{pd, cp, img.width, img.height};
+        unsigned w = img.width;
+        unsigned h = img.height;
+        auto m_img = h2l_image{pd, cp, w, h};
 
         auto m = m_img.mapmem();
         auto *c = static_cast<unsigned char *>(*m);

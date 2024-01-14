@@ -11,12 +11,12 @@ export class host_buffer {
 
 public:
   host_buffer() = default;
-  host_buffer(vee::physical_device pd, int sz) {
+  host_buffer(vee::physical_device pd, unsigned sz) {
     m_buf = vee::create_transfer_src_buffer(sz);
     m_mem = vee::create_host_buffer_memory(pd, *m_buf);
     vee::bind_buffer_memory(*m_buf, *m_mem);
   }
-  host_buffer(const device_and_queue &dq, int sz)
+  host_buffer(const device_and_queue &dq, unsigned sz)
       : host_buffer{dq.physical_device(), sz} {}
 
   [[nodiscard]] auto buffer() const noexcept { return *m_buf; }
@@ -33,7 +33,7 @@ class fenced_host_buffer {
 public:
   fenced_host_buffer() = default;
   fenced_host_buffer(vee::physical_device pd, vee::command_pool::type cp,
-                     int sz)
+                     unsigned sz)
       : m_hbuf{pd, sz}, m_fence{fence::signaled{}},
         m_cb{vee::allocate_primary_command_buffer(cp)} {}
 

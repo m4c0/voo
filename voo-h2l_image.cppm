@@ -17,8 +17,8 @@ export class h2l_image {
 
 public:
   h2l_image() = default;
-  explicit h2l_image(vee::physical_device pd, vee::command_pool::type cp, int w,
-                     int h, bool rgba = true)
+  explicit h2l_image(vee::physical_device pd, vee::command_pool::type cp,
+                     unsigned w, unsigned h, bool rgba = true)
       : m_hbuf{pd, cp, w * h * 4} {
     m_w = w;
     m_h = h;
@@ -34,7 +34,7 @@ public:
     vee::cmd_copy_buffer_to_image(*pcb, {m_w, m_h}, m_hbuf.buffer(), *m_img);
     vee::cmd_pipeline_barrier(*pcb, *m_img, vee::from_transfer_to_fragment);
   }
-  explicit h2l_image(const voo::device_and_queue &dq, int w, int h,
+  explicit h2l_image(const voo::device_and_queue &dq, unsigned w, unsigned h,
                      bool rgba = true)
       : h2l_image{dq.physical_device(), dq.command_pool(), w, h, rgba} {}
 

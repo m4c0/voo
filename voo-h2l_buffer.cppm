@@ -14,7 +14,7 @@ export class h2l_buffer {
 public:
   h2l_buffer() = default;
   explicit h2l_buffer(vee::physical_device pd, vee::command_pool::type cp,
-                      int sz)
+                      unsigned sz)
       : m_hbuf{pd, cp, sz} {
     m_buf =
         vee::create_buffer(sz, vee::vertex_buffer, vee::transfer_dst_buffer);
@@ -26,7 +26,7 @@ public:
     vee::cmd_copy_buffer(*pcb, m_hbuf.buffer(), *m_buf, sz);
     vee::cmd_pipeline_barrier(*pcb, *m_buf, vee::from_transfer_to_vertex);
   }
-  explicit h2l_buffer(const voo::device_and_queue &dq, int sz)
+  explicit h2l_buffer(const voo::device_and_queue &dq, unsigned sz)
       : h2l_buffer{dq.physical_device(), dq.command_pool(), sz} {}
 
   [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
