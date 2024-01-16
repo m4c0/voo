@@ -1,5 +1,6 @@
 export module voo:casein_thread;
 import :device_and_queue;
+import :frame_count;
 import :swapchain_and_stuff;
 import casein;
 import hai;
@@ -20,10 +21,15 @@ protected:
   [[nodiscard]] constexpr auto native_ptr() const noexcept { return m_nptr; }
 
   void extent_loop(auto fn) {
+    frame_count fc{};
+
     resized() = false;
     while (!interrupted() && !resized()) {
+      ++fc;
       fn();
     }
+
+    fc.print();
     vee::device_wait_idle();
   }
   void extent_loop(const device_and_queue &dq, swapchain_and_stuff &sw,
