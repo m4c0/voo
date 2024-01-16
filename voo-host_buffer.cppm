@@ -44,7 +44,7 @@ public:
 
   [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
     // TODO: split "wait" and "reset", call "reset" after memory is released
-    m_fence.wait_and_reset(timeout_ms);
+    m_fence.wait(timeout_ms);
     return m_dirty.guard(m_hbuf.memory());
   }
 
@@ -52,6 +52,7 @@ public:
     if (!m_dirty.get_and_clear())
       return;
 
+    m_fence.reset();
     vee::queue_submit({
         .queue = q,
         .fence = *m_fence,
