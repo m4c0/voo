@@ -14,6 +14,10 @@ public:
   void wait_and_reset(unsigned timeout_ms = ~0U) {
     vee::wait_and_reset_fence(*m_f, timeout_ms);
   }
+  void wait(unsigned timeout_ms = ~0U) {
+    vee::wait_for_fence(*m_f, timeout_ms);
+  }
+  void reset() { vee::reset_fence(*m_f); }
 
   [[nodiscard]] constexpr auto operator*() const noexcept { return *m_f; }
 };
