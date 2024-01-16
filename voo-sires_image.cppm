@@ -3,6 +3,7 @@ import :guards;
 import :h2l_image;
 import silog;
 import stubby;
+import traits;
 import vee;
 
 namespace voo {
@@ -22,7 +23,7 @@ export auto load_sires_image(const char *file, vee::physical_device pd,
 
         silog::log(silog::info, "Loaded %dx%d image [%s]", img.width,
                    img.height, file);
-        return m_img;
+        return traits::move(m_img);
       })
       .take([file](auto msg) {
         silog::log(silog::error, "Failed loading resource image [%s]: %s", file,
