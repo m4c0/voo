@@ -14,7 +14,8 @@ export class casein_thread : sith::thread, public casein::handler {
   volatile bool m_resized{};
 
   mtx::mutex m_mutex{};
-  hai::uptr<mtx::lock> m_lock{new mtx::lock{&m_mutex}};
+  mtx::cond m_cond{};
+  bool m_init{};
 
 protected:
   [[nodiscard]] auto &resized() noexcept { return m_resized; }
@@ -41,8 +42,17 @@ protected:
     });
   }
 
-  [[nodiscard]] auto wait_init() { return mtx::lock{&m_mutex}; }
-  void release_init_lock() { m_lock = {}; }
+  void wait_init() {
+    mtx::lock l{&m_mutex};
+    while (!interrupted() && !m_init) {
+      m_cond.wait(&l);
+    }
+  }
+  void release_init_lock() {
+    mtx::lock l{&m_mutex};
+    m_init = true;
+    m_cond.wake_all();
+  }
 
   using thread::interrupted;
 

@@ -16,7 +16,10 @@ class thread : public voo::casein_thread {
   voo::h2l_buffer *m_insts;
 
 public:
-  [[nodiscard]] auto instances() { return m_insts; }
+  [[nodiscard]] auto instances() {
+    wait_init();
+    return m_insts;
+  }
 
   void run() override {
     voo::device_and_queue dq{"winnipeg", native_ptr()};
@@ -27,7 +30,7 @@ public:
 
     voo::h2l_buffer insts{dq, 2 * sizeof(inst)};
     m_insts = &insts;
-
+    release_init_lock();
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
 
@@ -71,10 +74,7 @@ class loop : public sith::thread {
   ::thread *m_thr;
 
 public:
-  loop(::thread *t) : m_thr{t} {
-    // TODO: only start this thread when the render thread is ready
-    start();
-  }
+  loop(::thread *t) : m_thr{t} { start(); }
 
   void run() override {
     while (!interrupted()) {
