@@ -78,15 +78,16 @@ public:
     return m_idx = vee::acquire_next_image(*m_swc, *m_img_available_sema);
   }
 
-  auto cmd_render_pass(const cmd_buf_one_time_submit &pcb,
-                       bool use_secondary = false) const noexcept {
-    return voo::cmd_render_pass({
+  auto cmd_render_pass(vee::render_pass_begin rpb) const noexcept {
+    rpb.render_pass = render_pass();
+    rpb.framebuffer = framebuffer();
+    rpb.extent = extent();
+    return voo::cmd_render_pass(rpb);
+  }
+  auto cmd_render_pass(const cmd_buf_one_time_submit &pcb) const noexcept {
+    return cmd_render_pass({
         .command_buffer = *pcb,
-        .render_pass = render_pass(),
-        .framebuffer = framebuffer(),
-        .extent = extent(),
         .clear_color = {{0.1, 0.2, 0.3, 1.0}},
-        .use_secondary_cmd_buf = use_secondary,
     });
   }
   auto cmd_buf_render_pass_continue(vee::command_buffer cb) const noexcept {
