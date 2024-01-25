@@ -82,12 +82,15 @@ public:
       if (!buf)
         continue;
 
-      try {
-        auto m = buf->mapmem(100);
-        static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
-        static_cast<inst *>(*m)[1] = {-1, -1};
-      } catch (...) {
-      }
+      buf->mapmem(100)
+          .map([](auto &&m) {
+            try {
+              static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
+              static_cast<inst *>(*m)[1] = {-1, -1};
+            } catch (...) {
+            }
+          })
+          .take([](auto err) {});
     }
   }
 };

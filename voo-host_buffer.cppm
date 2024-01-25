@@ -2,6 +2,7 @@ export module voo:host_buffer;
 import :device_and_queue;
 import :dirty_flag;
 import :fence;
+import missingno;
 import vee;
 
 namespace voo {
@@ -44,7 +45,7 @@ public:
 
   [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
     m_fence.wait(timeout_ms);
-    return m_dirty.guard(m_hbuf.memory());
+    return mno::req{m_dirty.guard(m_hbuf.memory())};
   }
 
   void submit(const vee::queue &q) {
