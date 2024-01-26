@@ -1,17 +1,18 @@
 export module voo:dirty_flag;
+import :mapmem;
 import no;
 import traits;
 import vee;
 
 namespace voo {
 class dirt_guard : no::copy {
-  vee::mapmem m_mem{};
+  mapmem m_mem{};
   bool *m_dirty{};
 
 public:
   dirt_guard() = default;
   dirt_guard(vee::device_memory::type m, bool *flag)
-      : m_mem{vee::mapmem{m}}, m_dirty{flag} {}
+      : m_mem{mapmem{m}}, m_dirty{flag} {}
   ~dirt_guard() {
     if (m_dirty)
       *m_dirty = true;

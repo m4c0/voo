@@ -2,6 +2,7 @@ export module voo:host_buffer;
 import :device_and_queue;
 import :dirty_flag;
 import :fence;
+import :mapmem;
 import missingno;
 import mtx;
 import sith;
@@ -24,7 +25,7 @@ public:
 
   [[nodiscard]] auto buffer() const noexcept { return *m_buf; }
   [[nodiscard]] auto memory() const noexcept { return *m_mem; }
-  [[nodiscard]] auto mapmem() { return vee::mapmem{*m_mem}; }
+  [[nodiscard]] auto mapmem() { return voo::mapmem{*m_mem}; }
 };
 
 class fenced_host_buffer {

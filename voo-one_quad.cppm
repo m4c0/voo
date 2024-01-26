@@ -1,6 +1,7 @@
 export module voo:one_quad;
 import :device_and_queue;
 import :guards;
+import :mapmem;
 import vee;
 
 namespace {
@@ -26,7 +27,7 @@ public:
     m_qmem = vee::create_host_buffer_memory(pd, sizeof(quad));
     vee::bind_buffer_memory(*m_qbuf, *m_qmem, 0);
 
-    vee::mapmem mem{*m_qmem};
+    mapmem mem{*m_qmem};
     *static_cast<quad *>(*mem) = {};
   }
   explicit one_quad(const device_and_queue &dq)
