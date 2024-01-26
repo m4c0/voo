@@ -54,12 +54,12 @@ public:
       extent_loop([&] {
         sw.acquire_next_image();
 
-        insts.submit(dq);
-
         sw.one_time_submit(dq, [&](auto &pcb) {
+          insts.setup_copy(*pcb);
+
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_bind_gr_pipeline(*scb, *gp);
-          vee::cmd_bind_vertex_buffers(*scb, 1, insts.buffer());
+          vee::cmd_bind_vertex_buffers(*scb, 1, insts.local_buffer());
           quad.run(scb, 0, 2);
         });
         sw.queue_present(dq);
@@ -80,17 +80,12 @@ class loop {
       if (!buf)
         continue;
 
-      // There is a racing condition here. It can be triggered by disabling the
-      // update of fence status in host_buffer
-      buf->mapmem(t)
-          .map([](auto &&m) {
-            try {
-              static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
-              static_cast<inst *>(*m)[1] = {-1, -1};
-            } catch (...) {
-            }
-          })
-          .take([](auto err) {});
+      voo::mapmem m{buf->host_memory()};
+      try {
+        static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
+        static_cast<inst *>(*m)[1] = {-1, -1};
+      } catch (...) {
+      }
     }
   }
 

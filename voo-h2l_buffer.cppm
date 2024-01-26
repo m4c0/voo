@@ -1,40 +1,35 @@
 export module voo:h2l_buffer;
 import :device_and_queue;
-import :guards;
 import :host_buffer;
-import sith;
 import vee;
 
 namespace voo {
 export class h2l_buffer {
-  fenced_host_buffer m_hbuf;
+  host_buffer m_hbuf;
+  unsigned m_sz;
 
   vee::buffer m_buf;
   vee::device_memory m_mem;
 
 public:
   h2l_buffer() = default;
-  explicit h2l_buffer(vee::physical_device pd, vee::command_pool::type cp,
-                      unsigned sz)
-      : m_hbuf{pd, cp, sz} {
+  explicit h2l_buffer(vee::physical_device pd, unsigned sz)
+      : m_hbuf{pd, sz}, m_sz{sz} {
     m_buf =
         vee::create_buffer(sz, vee::vertex_buffer, vee::transfer_dst_buffer);
     m_mem = vee::create_local_buffer_memory(pd, *m_buf);
     vee::bind_buffer_memory(*m_buf, *m_mem);
-
-    voo::cmd_buf_sim_use pcb{m_hbuf.cmd_buf()};
-    vee::cmd_pipeline_barrier(*pcb, *m_buf, vee::from_host_to_transfer);
-    vee::cmd_copy_buffer(*pcb, m_hbuf.buffer(), *m_buf, sz);
-    vee::cmd_pipeline_barrier(*pcb, *m_buf, vee::from_transfer_to_vertex);
   }
   explicit h2l_buffer(const voo::device_and_queue &dq, unsigned sz)
-      : h2l_buffer{dq.physical_device(), dq.command_pool(), sz} {}
+      : h2l_buffer{dq.physical_device(), sz} {}
 
-  [[nodiscard]] auto mapmem(sith::thread *t) { return m_hbuf.mapmem(t); }
+  void setup_copy(vee::command_buffer cb) {
+    vee::cmd_pipeline_barrier(cb, *m_buf, vee::from_host_to_transfer);
+    vee::cmd_copy_buffer(cb, m_hbuf.buffer(), *m_buf, m_sz);
+    vee::cmd_pipeline_barrier(cb, *m_buf, vee::from_transfer_to_vertex);
+  }
 
-  void submit(const vee::queue &q) { m_hbuf.submit(q); }
-  void submit(const voo::device_and_queue &dq) { submit(dq.queue()); }
-
-  [[nodiscard]] auto buffer() const noexcept { return *m_buf; }
+  [[nodiscard]] auto host_memory() const noexcept { return m_hbuf.memory(); }
+  [[nodiscard]] auto local_buffer() const noexcept { return *m_buf; }
 };
 } // namespace voo

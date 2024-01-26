@@ -7,7 +7,7 @@ import vee;
 
 namespace voo {
 export class h2l_image {
-  fenced_host_buffer m_hbuf;
+  host_buffer m_hbuf;
 
   vee::image m_img;
   vee::device_memory m_mem;
@@ -18,9 +18,9 @@ export class h2l_image {
 
 public:
   h2l_image() = default;
-  explicit h2l_image(vee::physical_device pd, vee::command_pool::type cp,
-                     unsigned w, unsigned h, bool rgba = true)
-      : m_hbuf{pd, cp, w * h * 4} {
+  explicit h2l_image(vee::physical_device pd, unsigned w, unsigned h,
+                     bool rgba = true)
+      : m_hbuf{pd, w * h * 4} {
     m_w = w;
     m_h = h;
     m_img = vee::create_image({m_w, m_h}, rgba ? vee::image_format_srgba
@@ -29,21 +29,18 @@ public:
     vee::bind_image_memory(*m_img, *m_mem);
     m_iv = rgba ? vee::create_srgba_image_view(*m_img)
                 : vee::create_r8_image_view(*m_img);
-
-    voo::cmd_buf_sim_use pcb{m_hbuf.cmd_buf()};
-    vee::cmd_pipeline_barrier(*pcb, *m_img, vee::from_host_to_transfer);
-    vee::cmd_copy_buffer_to_image(*pcb, {m_w, m_h}, m_hbuf.buffer(), *m_img);
-    vee::cmd_pipeline_barrier(*pcb, *m_img, vee::from_transfer_to_fragment);
   }
   explicit h2l_image(const voo::device_and_queue &dq, unsigned w, unsigned h,
                      bool rgba = true)
-      : h2l_image{dq.physical_device(), dq.command_pool(), w, h, rgba} {}
+      : h2l_image{dq.physical_device(), w, h, rgba} {}
 
-  [[nodiscard]] auto mapmem(sith::thread *t) { return m_hbuf.mapmem(t); }
+  void setup_copy(vee::command_buffer cb) {
+    vee::cmd_pipeline_barrier(cb, *m_img, vee::from_host_to_transfer);
+    vee::cmd_copy_buffer_to_image(cb, {m_w, m_h}, m_hbuf.buffer(), *m_img);
+    vee::cmd_pipeline_barrier(cb, *m_img, vee::from_transfer_to_fragment);
+  }
 
-  void submit(const vee::queue &q) { m_hbuf.submit(q); }
-  void submit(const voo::device_and_queue &dq) { submit(dq.queue()); }
-
+  [[nodiscard]] auto host_memory() const noexcept { return m_hbuf.memory(); }
   [[nodiscard]] auto iv() const noexcept { return *m_iv; }
   [[nodiscard]] constexpr auto width() const noexcept { return m_w; }
   [[nodiscard]] constexpr auto height() const noexcept { return m_h; }
