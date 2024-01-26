@@ -25,7 +25,6 @@ public:
 
   [[nodiscard]] auto buffer() const noexcept { return *m_buf; }
   [[nodiscard]] auto memory() const noexcept { return *m_mem; }
-  [[nodiscard]] auto mapmem() { return voo::mapmem{*m_mem}; }
 };
 
 class fenced_host_buffer {
