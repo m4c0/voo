@@ -29,9 +29,7 @@ public:
   explicit h2l_buffer(const voo::device_and_queue &dq, unsigned sz)
       : h2l_buffer{dq.physical_device(), dq.command_pool(), sz} {}
 
-  [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
-    return m_hbuf.mapmem(timeout_ms);
-  }
+  [[nodiscard]] auto mapmem() { return m_hbuf.mapmem(); }
 
   void submit(const vee::queue &q) { m_hbuf.submit(q); }
   void submit(const voo::device_and_queue &dq) { submit(dq.queue()); }

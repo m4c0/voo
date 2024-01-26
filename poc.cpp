@@ -82,7 +82,7 @@ public:
       if (!buf)
         continue;
 
-      buf->mapmem(100)
+      buf->mapmem()
           .map([](auto &&m) {
             try {
               static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};

@@ -43,11 +43,13 @@ public:
   }
   [[nodiscard]] constexpr auto cmd_buf() const noexcept { return m_cb; }
 
-  [[nodiscard]] auto mapmem(unsigned timeout_ms = ~0U) {
-    m_fence.wait(timeout_ms);
+  // Meant to run on non-vulkan threads
+  [[nodiscard]] auto mapmem() {
+    m_fence.wait();
     return mno::req{m_dirty.guard(m_hbuf.memory())};
   }
 
+  // Meant to run on vulkan threads
   void submit(const vee::queue &q) {
     if (!m_dirty.get_and_clear())
       return;
