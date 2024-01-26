@@ -22,7 +22,7 @@ public:
   }
 
   void run() override {
-    voo::device_and_queue dq{"winnipeg", native_ptr()};
+    voo::device_and_queue dq{"voo-poc", native_ptr()};
 
     voo::one_quad quad{dq};
 
