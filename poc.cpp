@@ -70,19 +70,19 @@ public:
   }
 };
 
-class loop : public sith::thread {
+class loop {
   ::thread *m_thr;
+  sith::memfn_thread<loop> m_mt{this, &loop::run};
 
-public:
-  loop(::thread *t) : m_thr{t} { start(); }
-
-  void run() override {
-    while (!interrupted()) {
+  void run(sith::thread *t) {
+    while (!t->interrupted()) {
       auto buf = m_thr->instances();
       if (!buf)
         continue;
 
-      buf->mapmem()
+      // There is a racing condition here. It can be triggered by disabling the
+      // update of fence status in host_buffer
+      buf->mapmem(t)
           .map([](auto &&m) {
             try {
               static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
@@ -93,6 +93,9 @@ public:
           .take([](auto err) {});
     }
   }
+
+public:
+  loop(::thread *t) : m_thr{t} { m_mt.start(); }
 };
 
 extern "C" void casein_handle(const casein::event &e) {

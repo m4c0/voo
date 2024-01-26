@@ -3,6 +3,8 @@ import :device_and_queue;
 import :dirty_flag;
 import :fence;
 import missingno;
+import mtx;
+import sith;
 import vee;
 
 namespace voo {
@@ -30,6 +32,9 @@ class fenced_host_buffer {
   dirty_flag m_dirty{};
   fence m_fence{};
   vee::command_buffer m_cb;
+  mtx::mutex m_mtx{};
+  mtx::cond m_cond{};
+  volatile bool m_fence_status{};
 
 public:
   fenced_host_buffer() = default;
@@ -44,13 +49,23 @@ public:
   [[nodiscard]] constexpr auto cmd_buf() const noexcept { return m_cb; }
 
   // Meant to run on non-vulkan threads
-  [[nodiscard]] auto mapmem() {
-    m_fence.wait();
+  [[nodiscard]] auto mapmem(sith::thread *t) {
+    mtx::lock l{&m_mtx};
+    while (!m_fence_status && !t->interrupted()) {
+      m_cond.wait(&l);
+    }
+    // TODO: test if we can fix racing condition if we flip the "if/else"
+    // See poc for details
+    if (t->interrupted())
+      return mno::req<dirt_guard>::failed("Thread interrupted");
     return mno::req{m_dirty.guard(m_hbuf.memory())};
   }
 
   // Meant to run on vulkan threads
   void submit(const vee::queue &q) {
+    m_fence_status = m_fence.get();
+    m_cond.wake_one();
+
     if (!m_dirty.get_and_clear())
       return;
 
