@@ -11,6 +11,7 @@ public:
   fence() = default;
   fence(signaled s) : m_f{vee::create_fence_signaled()} {}
 
+  bool get() { return vee::get_fence_status(*m_f); }
   void wait_and_reset(unsigned timeout_ms = ~0U) {
     vee::wait_and_reset_fence(*m_f, timeout_ms);
   }
