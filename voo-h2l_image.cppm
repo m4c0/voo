@@ -34,7 +34,7 @@ public:
                      bool rgba = true)
       : h2l_image{dq.physical_device(), w, h, rgba} {}
 
-  void setup_copy(vee::command_buffer cb) {
+  void setup_copy(vee::command_buffer cb) const {
     vee::cmd_pipeline_barrier(cb, *m_img, vee::from_host_to_transfer);
     vee::cmd_copy_buffer_to_image(cb, {m_w, m_h}, m_hbuf.buffer(), *m_img);
     vee::cmd_pipeline_barrier(cb, *m_img, vee::from_transfer_to_fragment);

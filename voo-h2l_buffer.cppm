@@ -23,7 +23,7 @@ public:
   explicit h2l_buffer(const voo::device_and_queue &dq, unsigned sz)
       : h2l_buffer{dq.physical_device(), sz} {}
 
-  void setup_copy(vee::command_buffer cb) {
+  void setup_copy(vee::command_buffer cb) const {
     vee::cmd_pipeline_barrier(cb, *m_buf, vee::from_host_to_transfer);
     vee::cmd_copy_buffer(cb, m_hbuf.buffer(), *m_buf, m_sz);
     vee::cmd_pipeline_barrier(cb, *m_buf, vee::from_transfer_to_vertex);
