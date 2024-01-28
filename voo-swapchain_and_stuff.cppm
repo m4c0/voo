@@ -61,6 +61,9 @@ public:
     }
   }
 
+  [[nodiscard]] constexpr const auto command_buffer() const noexcept {
+    return m_cb;
+  }
   [[nodiscard]] constexpr const auto extent() const noexcept { return m_ext; }
   [[nodiscard]] constexpr const auto framebuffer() const noexcept {
     return *m_fbs[m_idx];
