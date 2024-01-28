@@ -73,33 +73,32 @@ public:
     return static_cast<float>(m_ext.width) / static_cast<float>(m_ext.height);
   }
 
-  auto acquire_next_image() noexcept {
+  auto acquire_next_image() {
     vee::wait_and_reset_fence(*m_f);
     return m_idx = vee::acquire_next_image(*m_swc, *m_img_available_sema);
   }
 
-  auto cmd_render_pass(vee::render_pass_begin rpb) const noexcept {
+  auto cmd_render_pass(vee::render_pass_begin rpb) const {
     rpb.render_pass = render_pass();
     rpb.framebuffer = framebuffer();
     rpb.extent = extent();
     return voo::cmd_render_pass(rpb);
   }
-  auto cmd_render_pass(const cmd_buf_one_time_submit &pcb) const noexcept {
+  auto cmd_render_pass(const cmd_buf_one_time_submit &pcb) const {
     return cmd_render_pass({
         .command_buffer = *pcb,
         .clear_color = {{0.1, 0.2, 0.3, 1.0}},
     });
   }
-  auto cmd_buf_render_pass_continue(vee::command_buffer cb) const noexcept {
+  auto cmd_buf_render_pass_continue(vee::command_buffer cb) const {
     return voo::cmd_buf_render_pass_continue(cb, render_pass(), extent());
   }
-  void cmd_buf_render_pass_continue(vee::command_buffer cb,
-                                    auto &&fn) const noexcept {
+  void cmd_buf_render_pass_continue(vee::command_buffer cb, auto &&fn) const {
     auto cbg = cmd_buf_render_pass_continue(cb);
     fn(cbg);
   }
 
-  void queue_submit(vee::queue q, vee::command_buffer cb) const noexcept {
+  void queue_submit(vee::queue q, vee::command_buffer cb) const {
     vee::queue_submit({
         .queue = q,
         .fence = *m_f,
@@ -108,16 +107,15 @@ public:
         .signal_semaphore = *m_rnd_finished_sema,
     });
   }
-  void queue_submit(const device_and_queue &dq,
-                    vee::command_buffer cb) const noexcept {
+  void queue_submit(const device_and_queue &dq, vee::command_buffer cb) const {
     queue_submit(dq.queue(), cb);
   }
 
-  void queue_submit(const device_and_queue &dq) const noexcept {
+  void queue_submit(const device_and_queue &dq) const {
     queue_submit(dq.queue(), m_cb);
   }
 
-  void queue_present(vee::queue q) const noexcept {
+  void queue_present(vee::queue q) const {
     vee::queue_present({
         .queue = q,
         .swapchain = *m_swc,
@@ -125,7 +123,7 @@ public:
         .image_index = m_idx,
     });
   }
-  void queue_present(const device_and_queue &dq) const noexcept {
+  void queue_present(const device_and_queue &dq) const {
     queue_present(dq.queue());
   }
 
