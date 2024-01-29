@@ -102,9 +102,6 @@ public:
         sw.queue_submit(dq);
       });
     }
-
-    // Wait until the queue is drained
-    dq.device_wait_idle();
   }
 };
 

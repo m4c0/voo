@@ -1,10 +1,11 @@
 export module voo:device_and_queue;
 import casein;
 import mtx;
+import no;
 import vee;
 
 namespace voo {
-export class device_and_queue {
+export class device_and_queue : no::no {
   vee::instance m_i;
   vee::debug_utils_messenger m_dbg;
   vee::surface m_s;
@@ -26,6 +27,7 @@ public:
     m_d = vee::create_single_queue_device(pd, qf);
     m_q = vee::get_queue_for_family(qf);
   }
+  ~device_and_queue() { vee::device_wait_idle(); }
 
   [[nodiscard]] constexpr const auto physical_device() const noexcept {
     return m_pd;
