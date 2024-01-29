@@ -16,7 +16,6 @@ struct inst {
 class thread : public voo::casein_thread {
   voo::device_and_queue *m_dq;
   voo::h2l_buffer *m_insts;
-  mtx::mutex m_qmtx;
 
 public:
   [[nodiscard]] auto dq() {
@@ -30,10 +29,7 @@ public:
 
   void queue_submit(vee::submit_info s) {
     wait_init();
-
-    mtx::lock l{&m_qmtx};
-    s.queue = m_dq->queue();
-    vee::queue_submit(s);
+    m_dq->queue_submit(s);
   }
 
   void run() override {
@@ -78,7 +74,6 @@ public:
           quad.run(scb, 0, 2);
         }
 
-        mtx::lock l{&m_qmtx};
         sw.queue_submit(dq);
         sw.queue_present(dq);
       });

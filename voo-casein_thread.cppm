@@ -33,8 +33,7 @@ protected:
     fc.print();
     vee::device_wait_idle();
   }
-  void extent_loop(const device_and_queue &dq, swapchain_and_stuff &sw,
-                   auto fn) {
+  void extent_loop(device_and_queue &dq, swapchain_and_stuff &sw, auto fn) {
     extent_loop([&] {
       sw.acquire_next_image();
       fn();

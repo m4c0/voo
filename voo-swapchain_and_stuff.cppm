@@ -101,33 +101,20 @@ public:
     fn(cbg);
   }
 
-  void queue_submit(vee::queue q, vee::command_buffer cb) const {
-    vee::queue_submit({
-        .queue = q,
+  void queue_submit(device_and_queue &dq) {
+    dq.queue_submit({
         .fence = *m_f,
-        .command_buffer = cb,
+        .command_buffer = m_cb,
         .wait_semaphore = *m_img_available_sema,
         .signal_semaphore = *m_rnd_finished_sema,
     });
   }
-  void queue_submit(const device_and_queue &dq, vee::command_buffer cb) const {
-    queue_submit(dq.queue(), cb);
-  }
-
-  void queue_submit(const device_and_queue &dq) const {
-    queue_submit(dq.queue(), m_cb);
-  }
-
-  void queue_present(vee::queue q) const {
-    vee::queue_present({
-        .queue = q,
+  void queue_present(device_and_queue &dq) {
+    dq.queue_present({
         .swapchain = *m_swc,
         .wait_semaphore = *m_rnd_finished_sema,
         .image_index = m_idx,
     });
-  }
-  void queue_present(const device_and_queue &dq) const {
-    queue_present(dq.queue());
   }
 };
 } // namespace voo

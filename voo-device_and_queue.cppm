@@ -1,5 +1,6 @@
 export module voo:device_and_queue;
 import casein;
+import mtx;
 import vee;
 
 namespace voo {
@@ -12,6 +13,7 @@ export class device_and_queue {
   vee::queue m_q;
   vee::command_pool m_cp;
   unsigned m_qf;
+  mtx::mutex m_qmtx{};
 
 public:
   device_and_queue(const char *app_name, casein::native_handle_t nptr) {
@@ -27,16 +29,27 @@ public:
     m_cp = vee::create_command_pool(qf);
   }
 
+  // TODO: thread-local pool?
   [[nodiscard]] constexpr const auto command_pool() const noexcept {
     return *m_cp;
   }
   [[nodiscard]] constexpr const auto physical_device() const noexcept {
     return m_pd;
   }
-  [[nodiscard]] constexpr const auto queue() const noexcept { return m_q; }
   [[nodiscard]] constexpr const auto queue_family() const noexcept {
     return m_qf;
   }
   [[nodiscard]] constexpr const auto surface() const noexcept { return *m_s; }
+
+  void queue_present(vee::present_info si) {
+    mtx::lock l{&m_qmtx};
+    si.queue = m_q;
+    vee::queue_present(si);
+  }
+  void queue_submit(vee::submit_info si) {
+    mtx::lock l{&m_qmtx};
+    si.queue = m_q;
+    vee::queue_submit(si);
+  }
 };
 } // namespace voo
