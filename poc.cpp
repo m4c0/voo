@@ -3,6 +3,7 @@
 #pragma leco add_shader "poc.frag"
 
 import casein;
+import mtx;
 import rng;
 import sith;
 import vee;
@@ -13,16 +14,31 @@ struct inst {
 };
 
 class thread : public voo::casein_thread {
+  voo::device_and_queue *m_dq;
   voo::h2l_buffer *m_insts;
+  mtx::mutex m_qmtx;
 
 public:
+  [[nodiscard]] auto dq() {
+    wait_init();
+    return m_dq;
+  }
   [[nodiscard]] auto instances() {
     wait_init();
     return m_insts;
   }
 
+  void queue_submit(vee::submit_info s) {
+    wait_init();
+
+    mtx::lock l{&m_qmtx};
+    s.queue = m_dq->queue();
+    vee::queue_submit(s);
+  }
+
   void run() override {
     voo::device_and_queue dq{"voo-poc", native_ptr()};
+    m_dq = &dq;
 
     voo::one_quad quad{dq};
 
@@ -56,20 +72,20 @@ public:
 
         {
           voo::cmd_buf_one_time_submit pcb{sw.command_buffer()};
-          insts.setup_copy(*pcb);
-
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_bind_gr_pipeline(*scb, *gp);
           vee::cmd_bind_vertex_buffers(*scb, 1, insts.local_buffer());
           quad.run(scb, 0, 2);
         }
 
+        mtx::lock l{&m_qmtx};
         sw.queue_submit(dq);
         sw.queue_present(dq);
       });
     }
 
     m_insts = nullptr;
+    m_dq = nullptr;
   }
 };
 
@@ -78,17 +94,31 @@ class main {
   sith::memfn_thread<main> m_mt{this, &main::run};
 
   void run(sith::thread *t) {
+    auto cp = vee::create_command_pool(m_thr.dq()->queue_family());
+    auto cb = vee::allocate_primary_command_buffer(*cp);
+
+    voo::fence f{voo::fence::signaled{}};
     while (!t->interrupted()) {
       auto buf = m_thr.instances();
       if (!buf)
         continue;
 
-      voo::mapmem m{buf->host_memory()};
-      try {
+      f.wait_and_reset();
+
+      {
+        voo::mapmem m{buf->host_memory()};
         static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
         static_cast<inst *>(*m)[1] = {-1, -1};
-      } catch (...) {
       }
+
+      {
+        voo::cmd_buf_one_time_submit pcb{cb};
+        buf->setup_copy(*pcb);
+      }
+      m_thr.queue_submit({
+          .fence = *f,
+          .command_buffer = cb,
+      });
     }
   }
 
