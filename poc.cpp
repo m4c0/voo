@@ -17,6 +17,16 @@ class updater {
   voo::device_and_queue *m_dq;
   voo::h2l_buffer m_insts{*m_dq, 2 * sizeof(inst)};
 
+  void load_instances() {
+    voo::mapmem m{m_insts.host_memory()};
+    static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
+    static_cast<inst *>(*m)[1] = {-1, -1};
+  }
+  void setup_copy(vee::command_buffer cb) {
+    voo::cmd_buf_one_time_submit pcb{cb};
+    m_insts.setup_copy(*pcb);
+  }
+
 public:
   updater(voo::device_and_queue &dq) : m_dq{&dq} {}
 
@@ -34,16 +44,9 @@ public:
     while (!t->interrupted()) {
       f.wait_and_reset();
 
-      {
-        voo::mapmem m{m_insts.host_memory()};
-        static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
-        static_cast<inst *>(*m)[1] = {-1, -1};
-      }
+      load_instances();
+      setup_copy(cb);
 
-      {
-        voo::cmd_buf_one_time_submit pcb{cb};
-        m_insts.setup_copy(*pcb);
-      }
       m_dq->queue_submit({
           .fence = *f,
           .command_buffer = cb,
