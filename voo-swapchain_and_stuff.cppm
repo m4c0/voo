@@ -129,20 +129,5 @@ public:
   void queue_present(const device_and_queue &dq) const {
     queue_present(dq.queue());
   }
-
-  void one_time_submit(
-      const device_and_queue &dq, vee::command_buffer cb,
-      is_fn_taking_const_ref<cmd_buf_one_time_submit> auto fn) const {
-    {
-      cmd_buf_one_time_submit pcb{cb};
-      fn(pcb);
-    }
-    queue_submit(dq, cb);
-  }
-  void one_time_submit(
-      const device_and_queue &dq,
-      is_fn_taking_const_ref<cmd_buf_one_time_submit> auto fn) const {
-    one_time_submit(dq, m_cb, fn);
-  }
 };
 } // namespace voo
