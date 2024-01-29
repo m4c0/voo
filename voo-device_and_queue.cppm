@@ -14,7 +14,7 @@ export class device_and_queue {
 
 public:
   device_and_queue(const char *app_name, casein::native_handle_t nptr) {
-    m_i = vee::create_instance("winnipeg");
+    m_i = vee::create_instance(app_name);
     m_dbg = vee::create_debug_utils_messenger();
     m_s = vee::create_surface(nptr);
     auto [pd, qf] = vee::find_physical_device_with_universal_queue(*m_s);
