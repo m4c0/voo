@@ -13,9 +13,8 @@ struct inst {
   float x, y;
 };
 
-class updater {
-  voo::device_and_queue *m_dq;
-  voo::h2l_buffer m_insts{*m_dq, 2 * sizeof(inst)};
+class updater : public voo::update_thread {
+  voo::h2l_buffer m_insts;
 
   void load_instances() {
     voo::mapmem m{m_insts.host_memory()};
@@ -27,35 +26,20 @@ class updater {
     m_insts.setup_copy(*pcb);
   }
 
+  void build_cmd_buf(vee::command_buffer cb) override {
+    load_instances();
+    setup_copy(cb);
+  }
+
 public:
-  updater(voo::device_and_queue &dq) : m_dq{&dq} {}
+  explicit updater(voo::device_and_queue *dq)
+      : update_thread{dq}, m_insts{*dq, 2 * sizeof(inst)} {}
 
   [[nodiscard]] constexpr auto local_buffer() const noexcept {
     return m_insts.local_buffer();
   }
 
-  void run(sith::thread *t) {
-    // We can't share cmd pool resources (i.e. cmd bufs) between threads, so we
-    // allocate our own.
-    auto cp = vee::create_command_pool(m_dq->queue_family());
-    auto cb = vee::allocate_primary_command_buffer(*cp);
-
-    voo::fence f{voo::fence::signaled{}};
-    while (!t->interrupted()) {
-      f.wait_and_reset();
-
-      load_instances();
-      setup_copy(cb);
-
-      m_dq->queue_submit({
-          .fence = *f,
-          .command_buffer = cb,
-      });
-    }
-
-    // Wait until our submissions are done
-    m_dq->device_wait_idle();
-  }
+  using update_thread::run;
 };
 
 class thread : public voo::casein_thread {
@@ -67,14 +51,14 @@ public:
 
     vee::pipeline_layout pl = vee::create_pipeline_layout();
 
-    updater u{dq};
+    updater u{&dq};
 
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
 
       // This ensures the thread dies before we leave this loop. This allows
       // release of "updater" resources without any racing with other threads
-      sith::memfn_thread upt{&u, &updater::run};
+      sith::memfn_thread<updater> upt{&u, &updater::run};
       upt.start();
 
       auto gp = vee::create_graphics_pipeline({

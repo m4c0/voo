@@ -11,3 +11,4 @@ export import :one_quad;
 export import :sires_image;
 export import :shader;
 export import :swapchain_and_stuff;
+export import :update_thread;
