@@ -11,6 +11,7 @@ export class device_and_queue {
   vee::device m_d;
   vee::queue m_q;
   vee::command_pool m_cp;
+  unsigned m_qf;
 
 public:
   device_and_queue(const char *app_name, casein::native_handle_t nptr) {
@@ -19,6 +20,7 @@ public:
     m_s = vee::create_surface(nptr);
     auto [pd, qf] = vee::find_physical_device_with_universal_queue(*m_s);
     m_pd = pd;
+    m_qf = qf;
 
     m_d = vee::create_single_queue_device(pd, qf);
     m_q = vee::get_queue_for_family(qf);
@@ -32,6 +34,9 @@ public:
     return m_pd;
   }
   [[nodiscard]] constexpr const auto queue() const noexcept { return m_q; }
+  [[nodiscard]] constexpr const auto queue_family() const noexcept {
+    return m_qf;
+  }
   [[nodiscard]] constexpr const auto surface() const noexcept { return *m_s; }
 };
 } // namespace voo
