@@ -31,7 +31,6 @@ protected:
     }
 
     fc.print();
-    vee::device_wait_idle();
   }
   void extent_loop(device_and_queue &dq, swapchain_and_stuff &sw, auto fn) {
     extent_loop([&] {
@@ -39,6 +38,7 @@ protected:
       fn();
       sw.queue_present(dq);
     });
+    dq.device_wait_idle();
   }
 
   void wait_init() {

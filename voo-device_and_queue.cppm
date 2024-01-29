@@ -41,6 +41,10 @@ public:
   }
   [[nodiscard]] constexpr const auto surface() const noexcept { return *m_s; }
 
+  void device_wait_idle() {
+    mtx::lock l{&m_qmtx};
+    vee::device_wait_idle();
+  }
   void queue_present(vee::present_info si) {
     mtx::lock l{&m_qmtx};
     si.queue = m_q;
