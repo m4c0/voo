@@ -70,13 +70,13 @@ public:
   }
 };
 
-class loop {
-  ::thread *m_thr;
-  sith::memfn_thread<loop> m_mt{this, &loop::run};
+class main {
+  ::thread m_thr{};
+  sith::memfn_thread<main> m_mt{this, &main::run};
 
   void run(sith::thread *t) {
     while (!t->interrupted()) {
-      auto buf = m_thr->instances();
+      auto buf = m_thr.instances();
       if (!buf)
         continue;
 
@@ -90,11 +90,12 @@ class loop {
   }
 
 public:
-  loop(::thread *t) : m_thr{t} { m_mt.start(); }
+  main() { m_mt.start(); }
+
+  void handle(const casein::event &e) { m_thr.handle(e); }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
-  static thread t{};
-  static loop l{&t};
-  t.handle(e);
+  static main m{};
+  m.handle(e);
 }
