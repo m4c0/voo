@@ -8,27 +8,32 @@ namespace voo {
 export class update_thread {
   voo::device_and_queue *m_dq;
 
+  // We can't share cmd pool resources (i.e. cmd bufs) between threads, so we
+  // allocate our own.
+  vee::command_pool m_cp = vee::create_command_pool(m_dq->queue_family());
+  vee::command_buffer m_cb = vee::allocate_primary_command_buffer(*m_cp);
+
+  voo::fence m_f{voo::fence::signaled{}};
+
 protected:
-  explicit constexpr update_thread(device_and_queue *dq) : m_dq{dq} {}
+  explicit update_thread(device_and_queue *dq) : m_dq{dq} {}
 
   virtual void build_cmd_buf(vee::command_buffer cb) = 0;
 
+  void run_once() {
+    m_f.wait_and_reset();
+
+    build_cmd_buf(m_cb);
+
+    m_dq->queue_submit({
+        .fence = *m_f,
+        .command_buffer = m_cb,
+    });
+  }
+
   void run(sith::thread *t) {
-    // We can't share cmd pool resources (i.e. cmd bufs) between threads, so we
-    // allocate our own.
-    auto cp = vee::create_command_pool(m_dq->queue_family());
-    auto cb = vee::allocate_primary_command_buffer(*cp);
-
-    voo::fence f{voo::fence::signaled{}};
     while (!t->interrupted()) {
-      f.wait_and_reset();
-
-      build_cmd_buf(cb);
-
-      m_dq->queue_submit({
-          .fence = *f,
-          .command_buffer = cb,
-      });
+      run_once();
     }
 
     // Wait until our submissions are done
