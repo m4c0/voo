@@ -15,13 +15,13 @@ struct inst {
 
 class updater : public sith::thread {
   voo::device_and_queue *m_dq;
-  voo::h2l_buffer insts{*m_dq, 2 * sizeof(inst)};
+  voo::h2l_buffer m_insts{*m_dq, 2 * sizeof(inst)};
 
 public:
   updater(voo::device_and_queue &dq) : m_dq{&dq} { start(); }
 
   [[nodiscard]] constexpr auto local_buffer() const noexcept {
-    return insts.local_buffer();
+    return m_insts.local_buffer();
   }
 
   void run() {
@@ -33,14 +33,14 @@ public:
       f.wait_and_reset();
 
       {
-        voo::mapmem m{insts.host_memory()};
+        voo::mapmem m{m_insts.host_memory()};
         static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
         static_cast<inst *>(*m)[1] = {-1, -1};
       }
 
       {
         voo::cmd_buf_one_time_submit pcb{cb};
-        insts.setup_copy(*pcb);
+        m_insts.setup_copy(*pcb);
       }
       m_dq->queue_submit({
           .fence = *f,
