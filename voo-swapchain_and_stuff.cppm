@@ -26,16 +26,17 @@ export class swapchain_and_stuff {
   hai::array<vee::image_view> m_civs;
   hai::array<vee::framebuffer> m_fbs;
 
+  vee::command_pool m_cp;
   vee::command_buffer m_cb;
 
   unsigned m_idx;
 
 public:
   swapchain_and_stuff(const device_and_queue &dq)
-      : swapchain_and_stuff(dq.physical_device(), dq.surface()) {
-    m_cb = vee::allocate_primary_command_buffer(dq.command_pool());
-  }
-  swapchain_and_stuff(vee::physical_device pd, vee::surface::type s) {
+      : swapchain_and_stuff(dq.physical_device(), dq.surface(),
+                            dq.queue_family()) {}
+  swapchain_and_stuff(vee::physical_device pd, vee::surface::type s,
+                      unsigned qf) {
     m_dimg = vee::create_depth_image(pd, s);
     m_dmem = vee::create_local_image_memory(pd, *m_dimg);
     vee::bind_image_memory(*m_dimg, *m_dmem);
@@ -59,6 +60,9 @@ public:
           .depth_buffer = *m_div,
       });
     }
+
+    m_cp = vee::create_command_pool(qf);
+    m_cb = vee::allocate_primary_command_buffer(*m_cp);
   }
 
   [[nodiscard]] constexpr const auto command_buffer() const noexcept {

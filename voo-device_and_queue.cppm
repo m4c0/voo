@@ -11,7 +11,6 @@ export class device_and_queue {
   vee::physical_device m_pd;
   vee::device m_d;
   vee::queue m_q;
-  vee::command_pool m_cp;
   unsigned m_qf;
   mtx::mutex m_qmtx{};
 
@@ -26,13 +25,8 @@ public:
 
     m_d = vee::create_single_queue_device(pd, qf);
     m_q = vee::get_queue_for_family(qf);
-    m_cp = vee::create_command_pool(qf);
   }
 
-  // TODO: thread-local pool?
-  [[nodiscard]] constexpr const auto command_pool() const noexcept {
-    return *m_cp;
-  }
   [[nodiscard]] constexpr const auto physical_device() const noexcept {
     return m_pd;
   }
