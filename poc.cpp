@@ -13,23 +13,23 @@ struct inst {
   float x, y;
 };
 
-class updater : public sith::thread {
+class updater {
   voo::device_and_queue *m_dq;
   voo::h2l_buffer m_insts{*m_dq, 2 * sizeof(inst)};
 
 public:
-  updater(voo::device_and_queue &dq) : m_dq{&dq} { start(); }
+  updater(voo::device_and_queue &dq) : m_dq{&dq} {}
 
   [[nodiscard]] constexpr auto local_buffer() const noexcept {
     return m_insts.local_buffer();
   }
 
-  void run() {
+  void run(sith::thread *t) {
     auto cp = vee::create_command_pool(m_dq->queue_family());
     auto cb = vee::allocate_primary_command_buffer(*cp);
 
     voo::fence f{voo::fence::signaled{}};
-    while (!interrupted()) {
+    while (!t->interrupted()) {
       f.wait_and_reset();
 
       {
@@ -47,6 +47,8 @@ public:
           .command_buffer = cb,
       });
     }
+
+    m_dq->device_wait_idle();
   }
 };
 
@@ -63,6 +65,8 @@ public:
 
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
+      sith::memfn_thread upt{&u, &updater::run};
+      upt.start();
 
       auto gp = vee::create_graphics_pipeline({
           .pipeline_layout = *pl,
@@ -92,6 +96,8 @@ public:
         sw.queue_submit(dq);
       });
     }
+
+    dq.device_wait_idle();
   }
 };
 
