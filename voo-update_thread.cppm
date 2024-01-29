@@ -5,6 +5,7 @@ import sith;
 import vee;
 
 namespace voo {
+// TODO: better naming, since this isn't a thread
 export class update_thread {
   voo::device_and_queue *m_dq;
 
