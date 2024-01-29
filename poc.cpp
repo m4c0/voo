@@ -63,9 +63,7 @@ public:
           },
       });
 
-      extent_loop([&] {
-        sw.acquire_next_image();
-
+      extent_loop(dq, sw, [&] {
         {
           voo::cmd_buf_one_time_submit pcb{sw.command_buffer()};
           auto scb = sw.cmd_render_pass(pcb);
@@ -73,9 +71,7 @@ public:
           vee::cmd_bind_vertex_buffers(*scb, 1, insts.local_buffer());
           quad.run(scb, 0, 2);
         }
-
         sw.queue_submit(dq);
-        sw.queue_present(dq);
       });
     }
 
