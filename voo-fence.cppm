@@ -2,7 +2,7 @@ export module voo:fence;
 import vee;
 
 namespace voo {
-class fence {
+export class fence {
   vee::fence m_f{};
 
 public:

@@ -1,6 +1,7 @@
 export module voo;
 export import :casein_thread;
 export import :device_and_queue;
+export import :fence;
 export import :guards;
 export import :h2l_buffer;
 export import :h2l_image;
