@@ -25,6 +25,8 @@ public:
   }
 
   void run(sith::thread *t) {
+    // We can't share cmd pool resources (i.e. cmd bufs) between threads, so we
+    // allocate our own.
     auto cp = vee::create_command_pool(m_dq->queue_family());
     auto cb = vee::allocate_primary_command_buffer(*cp);
 
@@ -48,6 +50,7 @@ public:
       });
     }
 
+    // Wait until our submissions are done
     m_dq->device_wait_idle();
   }
 };
@@ -65,6 +68,9 @@ public:
 
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
+
+      // This ensures the thread dies before we leave this loop. This allows
+      // release of "updater" resources without any racing with other threads
       sith::memfn_thread upt{&u, &updater::run};
       upt.start();
 
@@ -97,6 +103,7 @@ public:
       });
     }
 
+    // Wait until the queue is drained
     dq.device_wait_idle();
   }
 };
