@@ -40,5 +40,11 @@ protected:
     // Wait until our submissions are done
     m_dq->device_wait_idle();
   }
+
+  [[nodiscard]] auto start() {
+    sith::memfn_thread<update_thread> ut{this, &update_thread::run};
+    ut.start();
+    return ut;
+  }
 };
 } // namespace voo
