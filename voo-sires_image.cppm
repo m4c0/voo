@@ -36,7 +36,7 @@ export auto load_sires_image(jute::view file, vee::physical_device pd) {
       });
 }
 
-class sires_image : public voo::update_thread {
+export class sires_image : public voo::update_thread {
   voo::h2l_image m_img;
 
   void build_cmd_buf(vee::command_buffer cb) override {
