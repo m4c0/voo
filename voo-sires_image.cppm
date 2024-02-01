@@ -1,7 +1,9 @@
 export module voo:sires_image;
+import :device_and_queue;
 import :guards;
 import :h2l_image;
 import :mapmem;
+import :update_thread;
 import jute;
 import silog;
 import sith;
@@ -33,4 +35,22 @@ export auto load_sires_image(jute::view file, vee::physical_device pd) {
                    static_cast<int>(file.size()), file.data(), msg);
       });
 }
+
+class sires_image : public voo::update_thread {
+  voo::h2l_image m_img;
+
+  void build_cmd_buf(vee::command_buffer cb) override {
+    voo::cmd_buf_one_time_submit pcb{cb};
+    m_img.setup_copy(cb);
+  }
+
+public:
+  sires_image(jute::view name, voo::device_and_queue *dq) : update_thread{dq} {
+    m_img = voo::load_sires_image(name, dq->physical_device());
+  }
+
+  [[nodiscard]] constexpr auto iv() const noexcept { return m_img.iv(); }
+
+  using update_thread::run_once;
+};
 } // namespace voo
