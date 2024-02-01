@@ -1,5 +1,6 @@
 export module voo;
 export import :casein_thread;
+export import :command_pool;
 export import :device_and_queue;
 export import :fence;
 export import :guards;
