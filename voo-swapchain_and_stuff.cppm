@@ -120,5 +120,10 @@ public:
         .image_index = m_idx,
     });
   }
+
+  void queue_one_time_submit(device_and_queue &dq, auto &&fn) {
+    fn(voo::cmd_buf_one_time_submit{m_cb});
+    queue_submit(dq);
+  }
 };
 } // namespace voo

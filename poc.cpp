@@ -79,14 +79,12 @@ public:
       });
 
       extent_loop(dq, sw, [&] {
-        {
-          voo::cmd_buf_one_time_submit pcb{sw.command_buffer()};
+        sw.queue_one_time_submit(dq, [&](auto pcb) {
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_bind_gr_pipeline(*scb, *gp);
           vee::cmd_bind_vertex_buffers(*scb, 1, u.local_buffer());
           quad.run(scb, 0, 2);
-        }
-        sw.queue_submit(dq);
+        });
       });
     }
   }
