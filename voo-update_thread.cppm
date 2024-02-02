@@ -41,6 +41,8 @@ protected:
     m_dq->device_wait_idle();
   }
 
+  // TODO: this might contain a racing condition
+  // If the thread is moved before the new thread starts, "this" becomes invalid
   [[nodiscard]] auto start() {
     sith::memfn_thread<update_thread> ut{this, &update_thread::run};
     ut.start();
