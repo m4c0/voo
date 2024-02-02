@@ -50,6 +50,10 @@ public:
   }
 
   [[nodiscard]] constexpr auto iv() const noexcept { return m_img.iv(); }
+  [[nodiscard]] constexpr auto width() const noexcept { return m_img.width(); }
+  [[nodiscard]] constexpr auto height() const noexcept {
+    return m_img.height();
+  }
 
   using update_thread::run_once;
 };
