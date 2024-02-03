@@ -11,6 +11,7 @@ export class device_and_queue : no::no {
   vee::surface m_s;
   vee::physical_device m_pd;
   vee::device m_d;
+  vee::render_pass m_rp;
   vee::queue m_q;
   unsigned m_qf;
   mtx::mutex m_qmtx{};
@@ -25,6 +26,7 @@ public:
     m_qf = qf;
 
     m_d = vee::create_single_queue_device(pd, qf);
+    m_rp = vee::create_render_pass(pd, *m_s);
     m_q = vee::get_queue_for_family(qf);
   }
   ~device_and_queue() { vee::device_wait_idle(); }
@@ -34,6 +36,9 @@ public:
   }
   [[nodiscard]] constexpr const auto queue_family() const noexcept {
     return m_qf;
+  }
+  [[nodiscard]] constexpr const auto render_pass() const noexcept {
+    return *m_rp;
   }
   [[nodiscard]] constexpr const auto surface() const noexcept { return *m_s; }
 
