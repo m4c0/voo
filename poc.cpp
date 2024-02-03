@@ -53,6 +53,7 @@ public:
 
     updater u{&dq};
 
+    // TODO: fix validation issues while resizing
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
 
