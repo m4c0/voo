@@ -13,7 +13,7 @@ struct inst {
   float x, y;
 };
 
-class updater : voo::update_thread {
+class updater : public voo::update_thread {
   voo::h2l_buffer m_insts;
 
   void load_instances() {
@@ -39,7 +39,7 @@ public:
     return m_insts.local_buffer();
   }
 
-  using update_thread::start;
+  using update_thread::run;
 };
 
 class thread : public voo::casein_thread {
@@ -58,7 +58,8 @@ public:
 
       // This ensures the thread dies before we leave this loop. This allows
       // release of "updater" resources without any racing with other threads
-      u.start();
+      sith::memfn_thread<updater> ut{&u, &updater::run};
+      ut.start();
 
       auto gp = vee::create_graphics_pipeline({
           .pipeline_layout = *pl,
