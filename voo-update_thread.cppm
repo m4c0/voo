@@ -5,8 +5,7 @@ import sith;
 import vee;
 
 namespace voo {
-// TODO: better naming, since this isn't a thread
-export class update_thread {
+export class update_thread : public sith::thread {
   voo::device_and_queue *m_dq;
 
   // We can't share cmd pool resources (i.e. cmd bufs) between threads, so we
@@ -41,12 +40,6 @@ protected:
     m_dq->device_wait_idle();
   }
 
-  // TODO: this might contain a racing condition
-  // If the thread is moved before the new thread starts, "this" becomes invalid
-  [[nodiscard]] auto start() {
-    sith::memfn_thread<update_thread> ut{this, &update_thread::run};
-    ut.start();
-    return ut;
-  }
+  void run() override { run(this); }
 };
 } // namespace voo
