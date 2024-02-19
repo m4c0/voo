@@ -6,6 +6,7 @@ export import :fence;
 export import :guards;
 export import :h2l_buffer;
 export import :h2l_image;
+export import :h2l_yuv_image;
 export import :host_buffer;
 export import :mapmem;
 export import :one_quad;
