@@ -1,10 +1,13 @@
-export module voo::h2l_yuv_image;
+export module voo:h2l_yuv_image;
+import :device_and_queue;
+import :host_buffer;
+import vee;
 
 namespace voo {
 export class h2l_yuv_image {
   host_buffer m_buf_y;
   host_buffer m_buf_u;
-  host_buffer m_buf_b;
+  host_buffer m_buf_v;
 
   vee::sampler_ycbcr_conversion m_smp_conv;
 
@@ -17,10 +20,10 @@ export class h2l_yuv_image {
 
 public:
   h2l_yuv_image() = default;
-  explicit h2l_image(vee::physical_device pd, unsigned w, unsigned h)
+  explicit h2l_yuv_image(vee::physical_device pd, unsigned w, unsigned h)
       : m_buf_y{pd, w * h}
       , m_buf_u{pd, w * h / 4}
-      , m_buf_v{w * h / 4}
+      , m_buf_v{pd, w * h / 4}
       , m_smp_conv{vee::create_sampler_yuv420p_conversion(pd)}
       , m_w{w}
       , m_h{h} {
@@ -35,8 +38,9 @@ public:
 
   void setup_copy(vee::command_buffer cb) const {
     vee::cmd_pipeline_barrier(cb, *m_img, vee::from_host_to_transfer);
-    vee::cmd_copy_yuv420p_buffers_to_image(cb, {m_w, m_h}, *m_buf_y, *m_buf_u,
-                                           *m_buf_v, *m_img);
+    vee::cmd_copy_yuv420p_buffers_to_image(cb, {m_w, m_h}, m_buf_y.buffer(),
+                                           m_buf_u.buffer(), m_buf_v.buffer(),
+                                           *m_img);
     vee::cmd_pipeline_barrier(cb, *m_img, vee::from_transfer_to_fragment);
   }
 
