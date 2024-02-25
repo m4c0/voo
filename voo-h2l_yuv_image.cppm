@@ -49,6 +49,7 @@ public:
   [[nodiscard]] auto host_memory_v() const noexcept { return m_buf_v.memory(); }
 
   [[nodiscard]] auto iv() const noexcept { return *m_iv; }
+  [[nodiscard]] auto conv() const noexcept { return *m_smp_conv; }
   [[nodiscard]] constexpr auto width() const noexcept { return m_w; }
   [[nodiscard]] constexpr auto height() const noexcept { return m_h; }
 };
