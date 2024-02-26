@@ -4,6 +4,7 @@ import :guards;
 import :h2l_image;
 import :mapmem;
 import :update_thread;
+import :queue;
 import jute;
 import silog;
 import sith;
@@ -46,8 +47,10 @@ export class sires_image : public voo::update_thread {
 
 public:
   sires_image(jute::view name, voo::device_and_queue *dq)
-      : update_thread{dq->queue()}
-      , m_img{voo::load_sires_image(name, dq->physical_device())} {}
+      : sires_image{name, dq->physical_device(), dq->queue()} {}
+  sires_image(jute::view name, vee::physical_device pd, voo::queue *q)
+      : update_thread{q}
+      , m_img{voo::load_sires_image(name, pd)} {}
 
   [[nodiscard]] constexpr auto iv() const noexcept { return m_img.iv(); }
   [[nodiscard]] constexpr auto width() const noexcept { return m_img.width(); }
