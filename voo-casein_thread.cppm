@@ -3,7 +3,6 @@ import :frame_count;
 import :queue;
 import :swapchain_and_stuff;
 import casein;
-import hai;
 import mtx;
 import sith;
 import vee;
@@ -12,6 +11,7 @@ namespace voo {
 export class casein_thread : public sith::thread, public casein::handler {
   casein::native_handle_t m_nptr{};
   volatile bool m_resized{};
+  sith::run_guard m_run{};
 
   mtx::mutex m_mutex{};
   mtx::cond m_cond{};
@@ -61,13 +61,13 @@ public:
 
   void create_window(const casein::events::create_window &e) override {
     m_nptr = *e;
-    start();
+    m_run = sith::run_guard{this};
   }
 
   void resize_window(const casein::events::resize_window &e) override {
     m_resized = true;
   }
 
-  void quit(const casein::events::quit &e) override { stop(); }
+  void quit(const casein::events::quit &e) override { m_run = {}; }
 };
 } // namespace voo

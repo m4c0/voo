@@ -60,8 +60,7 @@ public:
 
       // This ensures the thread dies before we leave this loop. This allows
       // release of "updater" resources without any racing with other threads
-      sith::memfn_thread<updater> ut{&u, &updater::run};
-      ut.start();
+      sith::run_guard ut{&u};
 
       auto gp = vee::create_graphics_pipeline({
           .pipeline_layout = *pl,
