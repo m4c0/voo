@@ -44,7 +44,7 @@ public:
   [[nodiscard]] constexpr const auto surface() const noexcept { return *m_s; }
 
   [[nodiscard]] constexpr auto queue() noexcept {
-    return voo::queue{&m_qmtx, m_q};
+    return voo::queue{&m_qmtx, m_qf};
   }
 };
 } // namespace voo

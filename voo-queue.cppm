@@ -11,7 +11,9 @@ class queue {
   vee::queue m_q;
 
 public:
-  constexpr queue(mtx::mutex *m, vee::queue q) : m_qmtx{m}, m_q{q} {}
+  constexpr queue(mtx::mutex *m, unsigned qf)
+      : m_qmtx{m}
+      , m_q{vee::get_queue_for_family(qf)} {}
 
   void device_wait_idle() {
     mtx::lock l{m_qmtx};
