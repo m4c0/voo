@@ -13,9 +13,8 @@ export class device_and_queue : no::no {
   vee::physical_device m_pd;
   vee::device m_d;
   vee::render_pass m_rp;
-  vee::queue m_q;
+  queue m_q;
   unsigned m_qf;
-  mtx::mutex m_qmtx{};
 
 public:
   device_and_queue(const char *app_name, casein::native_handle_t nptr) {
@@ -28,7 +27,7 @@ public:
 
     m_d = vee::create_single_queue_device(pd, qf);
     m_rp = vee::create_render_pass(pd, *m_s);
-    m_q = vee::get_queue_for_family(qf);
+    m_q = voo::queue{qf};
   }
   ~device_and_queue() { vee::device_wait_idle(); }
 
@@ -43,8 +42,6 @@ public:
   }
   [[nodiscard]] constexpr const auto surface() const noexcept { return *m_s; }
 
-  [[nodiscard]] constexpr auto queue() noexcept {
-    return voo::queue{&m_qmtx, m_qf};
-  }
+  [[nodiscard]] constexpr auto *queue() noexcept { return &m_q; }
 };
 } // namespace voo

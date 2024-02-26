@@ -7,25 +7,24 @@ namespace voo {
 /// This performs "host synchronisation" for queue access, as required by
 /// Vulkan. It was designed with single-queue devices in mind (ex: Apple).
 class queue {
-  mtx::mutex *m_qmtx;
-  vee::queue m_q;
+  mtx::mutex m_qmtx{};
+  vee::queue m_q{};
 
 public:
-  constexpr queue(mtx::mutex *m, unsigned qf)
-      : m_qmtx{m}
-      , m_q{vee::get_queue_for_family(qf)} {}
+  constexpr queue() = default;
+  explicit queue(unsigned qf) : m_q{vee::get_queue_for_family(qf)} {}
 
   void device_wait_idle() {
-    mtx::lock l{m_qmtx};
+    mtx::lock l{&m_qmtx};
     vee::device_wait_idle();
   }
   void queue_present(vee::present_info si) {
-    mtx::lock l{m_qmtx};
+    mtx::lock l{&m_qmtx};
     si.queue = m_q;
     vee::queue_present(si);
   }
   void queue_submit(vee::submit_info si) {
-    mtx::lock l{m_qmtx};
+    mtx::lock l{&m_qmtx};
     si.queue = m_q;
     vee::queue_submit(si);
   }

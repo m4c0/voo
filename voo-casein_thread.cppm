@@ -32,13 +32,13 @@ protected:
 
     fc.print();
   }
-  void extent_loop(queue &dq, swapchain_and_stuff &sw, auto fn) {
+  void extent_loop(queue *q, swapchain_and_stuff &sw, auto fn) {
     extent_loop([&] {
       sw.acquire_next_image();
       fn();
-      sw.queue_present(dq);
+      sw.queue_present(q);
     });
-    dq.device_wait_idle();
+    q->device_wait_idle();
   }
 
   void wait_init() {

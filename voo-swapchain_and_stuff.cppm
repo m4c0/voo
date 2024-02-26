@@ -103,25 +103,25 @@ public:
     fn(cbg);
   }
 
-  void queue_submit(queue &dq) {
-    dq.queue_submit({
+  void queue_submit(queue *q) {
+    q->queue_submit({
         .fence = *m_f,
         .command_buffer = m_cb,
         .wait_semaphore = *m_img_available_sema,
         .signal_semaphore = *m_rnd_finished_sema,
     });
   }
-  void queue_present(queue &dq) {
-    dq.queue_present({
+  void queue_present(queue *q) {
+    q->queue_present({
         .swapchain = *m_swc,
         .wait_semaphore = *m_rnd_finished_sema,
         .image_index = m_idx,
     });
   }
 
-  void queue_one_time_submit(queue &dq, auto &&fn) {
+  void queue_one_time_submit(queue *q, auto &&fn) {
     fn(voo::cmd_buf_one_time_submit{m_cb});
-    queue_submit(dq);
+    queue_submit(q);
   }
 };
 } // namespace voo
