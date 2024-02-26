@@ -16,9 +16,10 @@ export class update_thread : public sith::thread {
   voo::fence m_f{voo::fence::signaled{}};
 
 protected:
-  explicit update_thread(device_and_queue *dq)
-      : m_q{dq->queue()}
-      , m_cp{vee::create_command_pool(dq->queue_family())}
+  explicit update_thread(device_and_queue *dq) : update_thread{dq->queue()} {}
+  explicit update_thread(queue *q)
+      : m_q{q}
+      , m_cp{vee::create_command_pool(q->queue_family())}
       , m_cb{vee::allocate_primary_command_buffer(*m_cp)} {}
 
   virtual void build_cmd_buf(vee::command_buffer cb) = 0;
