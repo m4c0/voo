@@ -1,6 +1,7 @@
 export module voo:update_thread;
 import :device_and_queue;
 import :fence;
+import :queue;
 import sith;
 import vee;
 

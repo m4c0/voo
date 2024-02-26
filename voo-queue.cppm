@@ -6,7 +6,7 @@ namespace voo {
 /// Queue access facade protected by a mutex.
 /// This performs "host synchronisation" for queue access, as required by
 /// Vulkan. It was designed with single-queue devices in mind (ex: Apple).
-class queue {
+export class queue {
   mtx::mutex m_qmtx{};
   vee::queue m_q{};
   unsigned m_qf{};
