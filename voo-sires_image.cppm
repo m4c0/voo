@@ -45,9 +45,9 @@ export class sires_image : public voo::update_thread {
   }
 
 public:
-  sires_image(jute::view name, voo::device_and_queue *dq) : update_thread{dq} {
-    m_img = voo::load_sires_image(name, dq->physical_device());
-  }
+  sires_image(jute::view name, voo::device_and_queue *dq)
+      : update_thread{dq->queue()}
+      , m_img{voo::load_sires_image(name, dq->physical_device())} {}
 
   [[nodiscard]] constexpr auto iv() const noexcept { return m_img.iv(); }
   [[nodiscard]] constexpr auto width() const noexcept { return m_img.width(); }

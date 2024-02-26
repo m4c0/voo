@@ -33,7 +33,8 @@ class updater : public voo::update_thread {
 
 public:
   explicit updater(voo::device_and_queue *dq)
-      : update_thread{dq}, m_insts{*dq, 2 * sizeof(inst)} {}
+      : update_thread{dq->queue()}
+      , m_insts{*dq, 2 * sizeof(inst)} {}
 
   [[nodiscard]] constexpr auto local_buffer() const noexcept {
     return m_insts.local_buffer();
