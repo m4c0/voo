@@ -1,6 +1,6 @@
 export module voo:casein_thread;
-import :device_and_queue;
 import :frame_count;
+import :queue;
 import :swapchain_and_stuff;
 import casein;
 import hai;
@@ -32,7 +32,7 @@ protected:
 
     fc.print();
   }
-  void extent_loop(device_and_queue &dq, swapchain_and_stuff &sw, auto fn) {
+  void extent_loop(queue &dq, swapchain_and_stuff &sw, auto fn) {
     extent_loop([&] {
       sw.acquire_next_image();
       fn();

@@ -79,8 +79,9 @@ public:
           },
       });
 
-      extent_loop(dq, sw, [&] {
-        sw.queue_one_time_submit(dq, [&](auto pcb) {
+      auto q = dq.queue();
+      extent_loop(q, sw, [&] {
+        sw.queue_one_time_submit(q, [&](auto pcb) {
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_bind_gr_pipeline(*scb, *gp);
           vee::cmd_bind_vertex_buffers(*scb, 1, u.local_buffer());

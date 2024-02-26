@@ -6,17 +6,20 @@ import vee;
 
 namespace voo {
 export class update_thread : public sith::thread {
-  voo::device_and_queue *m_dq;
+  voo::queue m_q;
 
   // We can't share cmd pool resources (i.e. cmd bufs) between threads, so we
   // allocate our own.
-  vee::command_pool m_cp = vee::create_command_pool(m_dq->queue_family());
-  vee::command_buffer m_cb = vee::allocate_primary_command_buffer(*m_cp);
+  vee::command_pool m_cp;
+  vee::command_buffer m_cb;
 
   voo::fence m_f{voo::fence::signaled{}};
 
 protected:
-  explicit update_thread(device_and_queue *dq) : m_dq{dq} {}
+  explicit update_thread(device_and_queue *dq)
+      : m_q{dq->queue()}
+      , m_cp{vee::create_command_pool(dq->queue_family())}
+      , m_cb{vee::allocate_primary_command_buffer(*m_cp)} {}
 
   virtual void build_cmd_buf(vee::command_buffer cb) = 0;
 
@@ -25,7 +28,7 @@ protected:
 
     build_cmd_buf(m_cb);
 
-    m_dq->queue_submit({
+    m_q.queue_submit({
         .fence = *m_f,
         .command_buffer = m_cb,
     });
@@ -37,7 +40,7 @@ protected:
     }
 
     // Wait until our submissions are done
-    m_dq->device_wait_idle();
+    m_q.device_wait_idle();
   }
 
   void run() override { run(this); }

@@ -1,6 +1,7 @@
 export module voo:swapchain_and_stuff;
 import :guards;
 import :device_and_queue;
+import :queue;
 import hai;
 import vee;
 
@@ -102,7 +103,7 @@ public:
     fn(cbg);
   }
 
-  void queue_submit(device_and_queue &dq) {
+  void queue_submit(queue &dq) {
     dq.queue_submit({
         .fence = *m_f,
         .command_buffer = m_cb,
@@ -110,7 +111,7 @@ public:
         .signal_semaphore = *m_rnd_finished_sema,
     });
   }
-  void queue_present(device_and_queue &dq) {
+  void queue_present(queue &dq) {
     dq.queue_present({
         .swapchain = *m_swc,
         .wait_semaphore = *m_rnd_finished_sema,
@@ -118,7 +119,7 @@ public:
     });
   }
 
-  void queue_one_time_submit(device_and_queue &dq, auto &&fn) {
+  void queue_one_time_submit(queue &dq, auto &&fn) {
     fn(voo::cmd_buf_one_time_submit{m_cb});
     queue_submit(dq);
   }
