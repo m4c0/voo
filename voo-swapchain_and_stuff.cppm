@@ -95,13 +95,6 @@ public:
         .clear_color = {{0.1, 0.2, 0.3, 1.0}},
     });
   }
-  auto cmd_buf_render_pass_continue(vee::command_buffer cb) const {
-    return voo::cmd_buf_render_pass_continue(cb, m_rp, extent());
-  }
-  void cmd_buf_render_pass_continue(vee::command_buffer cb, auto &&fn) const {
-    auto cbg = cmd_buf_render_pass_continue(cb);
-    fn(cbg);
-  }
 
   void queue_submit(queue *q) {
     q->queue_submit({

@@ -83,6 +83,8 @@ public:
       extent_loop(q, sw, [&] {
         sw.queue_one_time_submit(q, [&](auto pcb) {
           auto scb = sw.cmd_render_pass(pcb);
+          vee::cmd_set_viewport(*scb, sw.extent());
+          vee::cmd_set_scissor(*scb, sw.extent());
           vee::cmd_bind_gr_pipeline(*scb, *gp);
           vee::cmd_bind_vertex_buffers(*scb, 1, u.local_buffer());
           quad.run(scb, 0, 2);

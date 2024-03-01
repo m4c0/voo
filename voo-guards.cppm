@@ -53,10 +53,6 @@ public:
   explicit cmd_render_pass(const vee::render_pass_begin &rpb)
       : m_cb{rpb.command_buffer} {
     vee::cmd_begin_render_pass(rpb);
-    if (!rpb.use_secondary_cmd_buf) {
-      vee::cmd_set_scissor(m_cb, rpb.extent);
-      vee::cmd_set_viewport(m_cb, rpb.extent);
-    }
   }
   ~cmd_render_pass() { vee::cmd_end_render_pass(m_cb); }
 
@@ -78,12 +74,9 @@ export class cmd_buf_render_pass_continue {
 
 public:
   explicit cmd_buf_render_pass_continue(vee::command_buffer cb,
-                                        vee::render_pass::type rp,
-                                        vee::extent extent)
+                                        vee::render_pass::type rp)
       : m_cb{cb} {
     vee::begin_cmd_buf_render_pass_continue(m_cb, rp);
-    vee::cmd_set_scissor(m_cb, extent);
-    vee::cmd_set_viewport(m_cb, extent);
   }
   ~cmd_buf_render_pass_continue() { vee::end_cmd_buf(m_cb); }
 
