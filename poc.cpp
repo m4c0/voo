@@ -52,14 +52,11 @@ public:
 
     vee::pipeline_layout pl = vee::create_pipeline_layout();
 
-    updater u{&dq};
-
     // TODO: fix validation issues while resizing
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
 
-      // This ensures the thread dies before we leave this loop. This allows
-      // release of "updater" resources without any racing with other threads
+      updater u{&dq};
       sith::run_guard ut{&u};
 
       auto gp = vee::create_graphics_pipeline({
