@@ -82,4 +82,9 @@ public:
   using update_thread::run;
   using update_thread::run_once;
 };
+export template <typename T> updater_thread(queue *, T) -> updater_thread<T>;
+export template <typename T>
+updater_thread(queue *, T, void (*)(T *)) -> updater_thread<T>;
+export template <typename T>
+updater_thread(queue *, void (*)(T *), auto &&...) -> updater_thread<T>;
 } // namespace voo
