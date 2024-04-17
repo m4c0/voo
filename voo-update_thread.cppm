@@ -1,8 +1,10 @@
 export module voo:update_thread;
 import :device_and_queue;
 import :fence;
+import :guards;
 import :queue;
 import sith;
+import traits;
 import vee;
 
 namespace voo {
@@ -45,5 +47,30 @@ protected:
   }
 
   void run() override { run(this); }
+};
+
+export template <typename T> class updater_thread : public update_thread {
+  T m_data;
+
+  void build_cmd_buf(vee::command_buffer cb) override {
+    update_data(&m_data);
+
+    cmd_buf_one_time_submit pcb{cb};
+    m_data.setup_copy(cb);
+  }
+
+protected:
+  virtual void update_data(T *data) = 0;
+
+public:
+  updater_thread(queue *q, T data)
+      : update_thread{q}
+      , m_data{traits::move(data)} {}
+
+  [[nodiscard]] constexpr T &data() noexcept { return m_data; }
+  [[nodiscard]] constexpr const T &data() const noexcept { return m_data; }
+
+  using update_thread::run;
+  using update_thread::run_once;
 };
 } // namespace voo
