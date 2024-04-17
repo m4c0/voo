@@ -13,17 +13,11 @@ struct inst {
   float x, y;
 };
 
-class updater : public voo::updater_thread<voo::h2l_buffer> {
-  void update_data(voo::h2l_buffer *insts) {
-    voo::mapmem m{insts->host_memory()};
-    static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
-    static_cast<inst *>(*m)[1] = {-1, -1};
-  }
-
-public:
-  explicit updater(voo::device_and_queue *dq)
-      : updater_thread{dq->queue(), voo::h2l_buffer{*dq, 2 * sizeof(inst)}} {}
-};
+void create_instances(voo::h2l_buffer *insts) {
+  voo::mapmem m{insts->host_memory()};
+  static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
+  static_cast<inst *>(*m)[1] = {-1, -1};
+}
 
 class thread : public voo::casein_thread {
 public:
@@ -38,7 +32,9 @@ public:
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
 
-      updater u{&dq};
+      constexpr const unsigned sz = 2 * sizeof(inst);
+      voo::updater_thread<voo::h2l_buffer> u{dq.queue(), &create_instances, dq,
+                                             sz};
       sith::run_guard ut{&u};
 
       auto gp = vee::create_graphics_pipeline({

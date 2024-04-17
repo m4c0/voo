@@ -51,6 +51,7 @@ protected:
 
 export template <typename T> class updater_thread : public update_thread {
   T m_data;
+  void (*m_fn)(T *){};
 
   void build_cmd_buf(vee::command_buffer cb) override {
     update_data(&m_data);
@@ -60,12 +61,20 @@ export template <typename T> class updater_thread : public update_thread {
   }
 
 protected:
-  virtual void update_data(T *data) = 0;
+  virtual void update_data(T *data) { m_fn(data); }
 
 public:
   updater_thread(queue *q, T data)
       : update_thread{q}
       , m_data{traits::move(data)} {}
+  updater_thread(queue *q, T data, void (*fn)(T *))
+      : update_thread{q}
+      , m_data{traits::move(data)}
+      , m_fn{fn} {}
+  updater_thread(queue *q, void (*fn)(T *), auto &&...args)
+      : update_thread{q}
+      , m_data{args...}
+      , m_fn{fn} {}
 
   [[nodiscard]] constexpr T &data() noexcept { return m_data; }
   [[nodiscard]] constexpr const T &data() const noexcept { return m_data; }
