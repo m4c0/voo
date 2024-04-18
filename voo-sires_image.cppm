@@ -3,7 +3,7 @@ import :device_and_queue;
 import :guards;
 import :h2l_image;
 import :mapmem;
-import :update_thread;
+import :updater;
 import :queue;
 import jute;
 import silog;
@@ -38,27 +38,19 @@ export auto load_sires_image(jute::view file, vee::physical_device pd) {
 }
 
 // TODO: change to only create the image inside "run"
-export class sires_image : public voo::update_thread {
-  voo::h2l_image m_img;
-
-  void build_cmd_buf(vee::command_buffer cb) override {
-    voo::cmd_buf_one_time_submit pcb{cb};
-    m_img.setup_copy(cb);
-  }
+export class sires_image : public updater<h2l_image> {
+  void update_data(h2l_image *img) override {}
 
 public:
   sires_image(jute::view name, voo::device_and_queue *dq)
       : sires_image{name, dq->physical_device(), dq->queue()} {}
   sires_image(jute::view name, vee::physical_device pd, voo::queue *q)
-      : update_thread{q}
-      , m_img{voo::load_sires_image(name, pd)} {}
+      : updater{q, load_sires_image(name, pd)} {}
 
-  [[nodiscard]] constexpr auto iv() const noexcept { return m_img.iv(); }
-  [[nodiscard]] constexpr auto width() const noexcept { return m_img.width(); }
+  [[nodiscard]] constexpr auto iv() const noexcept { return data().iv(); }
+  [[nodiscard]] constexpr auto width() const noexcept { return data().width(); }
   [[nodiscard]] constexpr auto height() const noexcept {
-    return m_img.height();
+    return data().height();
   }
-
-  using update_thread::run_once;
 };
 } // namespace voo
