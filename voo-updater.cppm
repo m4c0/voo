@@ -6,7 +6,7 @@ import traits;
 import vee;
 
 export namespace voo {
-template <typename T> class updater_thread : public update_thread {
+template <typename T> class updater : public update_thread {
   T m_data;
   void (*m_fn)(T *){};
 
@@ -21,14 +21,12 @@ protected:
   virtual void update_data(T *data) { m_fn(data); }
 
 public:
-  updater_thread(queue *q, T data)
-      : update_thread{q}
-      , m_data{traits::move(data)} {}
-  updater_thread(queue *q, T data, void (*fn)(T *))
+  updater(queue *q, T data) : update_thread{q}, m_data{traits::move(data)} {}
+  updater(queue *q, T data, void (*fn)(T *))
       : update_thread{q}
       , m_data{traits::move(data)}
       , m_fn{fn} {}
-  updater_thread(queue *q, void (*fn)(T *), auto &&...args)
+  updater(queue *q, void (*fn)(T *), auto &&...args)
       : update_thread{q}
       , m_data{args...}
       , m_fn{fn} {}
@@ -39,9 +37,7 @@ public:
   using update_thread::run;
   using update_thread::run_once;
 };
-template <typename T> updater_thread(queue *, T) -> updater_thread<T>;
-template <typename T>
-updater_thread(queue *, T, void (*)(T *)) -> updater_thread<T>;
-template <typename T>
-updater_thread(queue *, void (*)(T *), auto &&...) -> updater_thread<T>;
+template <typename T> updater(queue *, T) -> updater<T>;
+template <typename T> updater(queue *, T, void (*)(T *)) -> updater<T>;
+template <typename T> updater(queue *, void (*)(T *), auto &&...) -> updater<T>;
 } // namespace voo

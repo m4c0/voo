@@ -33,7 +33,7 @@ public:
       voo::swapchain_and_stuff sw{dq};
 
       constexpr const unsigned sz = 2 * sizeof(inst);
-      auto u = voo::updater_thread{dq.queue(), &create_instances, dq, sz};
+      auto u = voo::updater{dq.queue(), &create_instances, dq, sz};
       sith::run_guard ut{&u};
 
       auto gp = vee::create_graphics_pipeline({
