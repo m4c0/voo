@@ -37,20 +37,22 @@ export auto load_sires_image(jute::view file, vee::physical_device pd) {
       });
 }
 
-// TODO: change to only create the image inside "run"
 export class sires_image : public updater<h2l_image> {
-  void update_data(h2l_image *img) override {}
+  jute::view m_name;
+  vee::physical_device m_pd;
+
+  void update_data(h2l_image *img) override {
+    *img = load_sires_image(m_name, m_pd);
+  }
 
 public:
   sires_image(jute::view name, voo::device_and_queue *dq)
       : sires_image{name, dq->physical_device(), dq->queue()} {}
   sires_image(jute::view name, vee::physical_device pd, voo::queue *q)
-      : updater{q, load_sires_image(name, pd)} {}
-
-  [[nodiscard]] constexpr auto iv() const noexcept { return data().iv(); }
-  [[nodiscard]] constexpr auto width() const noexcept { return data().width(); }
-  [[nodiscard]] constexpr auto height() const noexcept {
-    return data().height();
+      : updater{q, {}}
+      , m_name{name}
+      , m_pd{pd} {
+    run_once();
   }
 };
 } // namespace voo
