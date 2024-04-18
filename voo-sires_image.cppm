@@ -37,6 +37,7 @@ export auto load_sires_image(jute::view file, vee::physical_device pd) {
       });
 }
 
+// TODO: change to only create the image inside "run"
 export class sires_image : public voo::update_thread {
   voo::h2l_image m_img;
 
