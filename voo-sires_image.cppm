@@ -51,8 +51,6 @@ public:
   sires_image(jute::view name, vee::physical_device pd, voo::queue *q)
       : updater{q, {}}
       , m_name{name}
-      , m_pd{pd} {
-    run_once();
-  }
+      , m_pd{pd} {}
 };
 } // namespace voo
