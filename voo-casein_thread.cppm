@@ -8,7 +8,7 @@ import sith;
 import vee;
 
 namespace voo {
-export class casein_thread : public sith::thread, public casein::handler {
+export class casein_thread : public sith::thread {
   volatile bool m_resized{};
   sith::run_guard m_run{};
 
