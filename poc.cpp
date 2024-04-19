@@ -19,10 +19,9 @@ void create_instances(voo::h2l_buffer *insts) {
   static_cast<inst *>(*m)[1] = {-1, -1};
 }
 
-class thread : public voo::casein_thread {
-public:
+static struct : public voo::casein_thread {
   void run() override {
-    voo::device_and_queue dq{"voo-poc", native_ptr()};
+    voo::device_and_queue dq{"voo-poc"};
 
     voo::one_quad quad{dq};
 
@@ -66,9 +65,4 @@ public:
       });
     }
   }
-};
-
-extern "C" void casein_handle(const casein::event &e) {
-  static thread t{};
-  t.handle(e);
-}
+} t;

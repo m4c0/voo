@@ -9,7 +9,6 @@ import vee;
 
 namespace voo {
 export class casein_thread : public sith::thread, public casein::handler {
-  casein::native_handle_t m_nptr{};
   volatile bool m_resized{};
   sith::run_guard m_run{};
 
@@ -19,7 +18,6 @@ export class casein_thread : public sith::thread, public casein::handler {
 
 protected:
   [[nodiscard]] auto &resized() noexcept { return m_resized; }
-  [[nodiscard]] constexpr auto native_ptr() const noexcept { return m_nptr; }
 
   void extent_loop(auto fn) {
     frame_count fc{};
@@ -56,18 +54,7 @@ protected:
   using thread::interrupted;
 
 public:
-  casein_thread() = default;
+  casein_thread();
   virtual ~casein_thread() = default;
-
-  void create_window(const casein::events::create_window &e) override {
-    m_nptr = *e;
-    m_run = sith::run_guard{this};
-  }
-
-  void resize_window(const casein::events::resize_window &e) override {
-    m_resized = true;
-  }
-
-  void quit(const casein::events::quit &e) override { m_run = {}; }
 };
 } // namespace voo

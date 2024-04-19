@@ -17,10 +17,10 @@ export class device_and_queue : no::no {
   unsigned m_qf;
 
 public:
-  device_and_queue(const char *app_name, casein::native_handle_t nptr) {
+  device_and_queue(const char *app_name) {
     m_i = vee::create_instance(app_name);
     m_dbg = vee::create_debug_utils_messenger();
-    m_s = vee::create_surface(nptr);
+    m_s = vee::create_surface(casein::native_ptr);
     auto [pd, qf] = vee::find_physical_device_with_universal_queue(*m_s);
     m_pd = pd;
     m_qf = qf;

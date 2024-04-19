@@ -16,3 +16,5 @@ export import :swapchain_and_stuff;
 export import :queue;
 export import :update_thread;
 export import :updater;
+
+#pragma leco add_impl casein_thread
