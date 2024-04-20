@@ -37,20 +37,4 @@ export auto load_sires_image(jute::view file, vee::physical_device pd) {
       });
 }
 
-export class sires_image : public updater<h2l_image> {
-  jute::view m_name;
-  vee::physical_device m_pd;
-
-  void update_data(h2l_image *img) override {
-    *img = load_sires_image(m_name, m_pd);
-  }
-
-public:
-  sires_image(jute::view name, voo::device_and_queue *dq)
-      : sires_image{name, dq->physical_device(), dq->queue()} {}
-  sires_image(jute::view name, vee::physical_device pd, voo::queue *q)
-      : updater{q, {}}
-      , m_name{name}
-      , m_pd{pd} {}
-};
 } // namespace voo
