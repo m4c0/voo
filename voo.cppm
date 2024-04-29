@@ -17,6 +17,7 @@ export import :queue;
 export import :update_thread;
 export import :updater;
 import jute;
+import traits;
 import vee;
 
 #pragma leco add_impl casein_thread
