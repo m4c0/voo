@@ -31,10 +31,8 @@ export auto load_sires_image(jute::view file, vee::physical_device pd) {
                    img.height, static_cast<int>(file.size()), file.data());
         return traits::move(m_img);
       })
-      .take([file](auto msg) {
-        silog::log(silog::error, "Failed loading resource image [%.*s]: %s",
-                   static_cast<int>(file.size()), file.data(), msg);
-      });
+      .trace("Loading resource image: " + file)
+      .log_error();
 }
 
 } // namespace voo
