@@ -31,7 +31,7 @@ export auto load_sires_image(jute::view file, vee::physical_device pd) {
                    img.height, static_cast<int>(file.size()), file.data());
         return traits::move(m_img);
       })
-      .trace("Loading resource image: " + file)
+      .trace("loading resource image")
       .log_error();
 }
 
