@@ -74,5 +74,9 @@ public:
       : updater{q, {}}
       , m_name{name}
       , m_pd{pd} {}
+
+  constexpr static auto of(jute::view name) {
+    return [=](voo::device_and_queue *dq) { return new sires_image(name, dq); };
+  }
 };
 } // namespace voo
