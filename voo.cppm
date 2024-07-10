@@ -58,42 +58,4 @@ public:
 template <typename T> updater(queue *, T) -> updater<T>;
 template <typename T> updater(queue *, T, void (*)(T *)) -> updater<T>;
 template <typename T> updater(queue *, void (*)(T *), auto &&...) -> updater<T>;
-
-class image_updater : public updater<h2l_image> {
-  using fn_t = void (*)(h2l_image *, vee::physical_device pd);
-
-  vee::physical_device m_pd;
-  fn_t m_fn;
-
-  void update_data(h2l_image *img) { m_fn(img, m_pd); }
-
-public:
-  image_updater(voo::device_and_queue *dq, fn_t fn)
-      : image_updater{dq->physical_device(), dq->queue(), fn} {}
-  image_updater(vee::physical_device pd, voo::queue *q, fn_t fn)
-      : updater{q, {}}
-      , m_pd{pd}
-      , m_fn{fn} {}
-};
-
-class sires_image : public updater<h2l_image> {
-  jute::view m_name;
-  vee::physical_device m_pd;
-
-  void update_data(h2l_image *img) override {
-    *img = load_sires_image(m_name, m_pd);
-  }
-
-public:
-  sires_image(jute::view name, voo::device_and_queue *dq)
-      : sires_image{name, dq->physical_device(), dq->queue()} {}
-  sires_image(jute::view name, vee::physical_device pd, voo::queue *q)
-      : updater{q, {}}
-      , m_name{name}
-      , m_pd{pd} {}
-
-  constexpr static auto of(jute::view name) {
-    return [=](voo::device_and_queue *dq) { return new sires_image(name, dq); };
-  }
-};
 } // namespace voo
