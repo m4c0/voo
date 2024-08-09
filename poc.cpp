@@ -13,40 +13,40 @@ struct inst {
   float x, y;
 };
 
-void create_instances(voo::h2l_buffer *insts) {
-  voo::mapmem m{insts->host_memory()};
-  static_cast<inst *>(*m)[0] = {rng::randf(), rng::randf()};
-  static_cast<inst *>(*m)[1] = {-1, -1};
+void create_instances(voo::h2l_buffer * insts) {
+  voo::mapmem m { insts->host_memory() };
+  static_cast<inst *>(*m)[0] = { rng::randf(), rng::randf() };
+  static_cast<inst *>(*m)[1] = { -1, -1 };
 }
 
 static struct : public voo::casein_thread {
   void run() override {
-    voo::device_and_queue dq{"voo-poc"};
+    voo::device_and_queue dq { "voo-poc" };
 
-    voo::one_quad quad{dq};
+    voo::one_quad quad { dq };
 
     vee::pipeline_layout pl = vee::create_pipeline_layout();
 
     // TODO: fix validation issues while resizing
     while (!interrupted()) {
-      voo::swapchain_and_stuff sw{dq};
+      voo::swapchain_and_stuff sw { dq };
 
       constexpr const unsigned sz = 2 * sizeof(inst);
-      auto u = voo::updater{dq.queue(), &create_instances, dq, sz};
-      sith::run_guard ut{&u};
+      auto u = voo::updater { dq.queue(), &create_instances, dq, sz };
+      sith::run_guard ut { &u };
 
       auto gp = vee::create_graphics_pipeline({
           .pipeline_layout = *pl,
           .render_pass = dq.render_pass(),
-          .shaders{
+          .shaders {
               voo::shader("poc.vert.spv").pipeline_vert_stage(),
               voo::shader("poc.frag.spv").pipeline_frag_stage(),
           },
-          .bindings{
+          .bindings {
               quad.vertex_input_bind(),
               vee::vertex_input_bind_per_instance(sizeof(inst)),
           },
-          .attributes{
+          .attributes {
               quad.vertex_attribute(0),
               vee::vertex_attribute_vec2(1, 0),
           },
