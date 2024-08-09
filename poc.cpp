@@ -27,7 +27,6 @@ static struct : public voo::casein_thread {
 
     vee::pipeline_layout pl = vee::create_pipeline_layout();
 
-    // TODO: fix validation issues while resizing
     while (!interrupted()) {
       voo::swapchain_and_stuff sw { dq };
 
