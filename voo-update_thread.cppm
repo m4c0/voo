@@ -16,6 +16,7 @@ export class update_thread : public sith::thread {
   voo::fence m_f{voo::fence::signaled{}};
 
 protected:
+  constexpr update_thread() = default;
   explicit update_thread(queue *q)
       : m_q{q}
       , m_cp{vee::create_command_pool(q->queue_family())}

@@ -39,6 +39,7 @@ protected:
   virtual void update_data(T *data) { m_fn(data); }
 
 public:
+  constexpr updater() = default;
   updater(queue *q, T data) : update_thread{q}, m_data{traits::move(data)} {}
   updater(queue *q, T data, void (*fn)(T *))
       : update_thread{q}
