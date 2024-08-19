@@ -34,5 +34,7 @@ export auto load_sires_image(jute::view file, vee::physical_device pd) {
       .trace("loading resource image")
       .log_error();
 }
-
+export constexpr auto load_sires_image(jute::view file) {
+  return [=](vee::physical_device pd) { return load_sires_image(file, pd); };
+}
 } // namespace voo
