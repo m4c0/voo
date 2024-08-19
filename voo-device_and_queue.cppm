@@ -17,6 +17,7 @@ export class device_and_queue : no::no {
   unsigned m_qf;
 
 public:
+  device_and_queue() : device_and_queue(casein::window_title.cstr().begin()) {}
   device_and_queue(const char *app_name) {
     m_i = vee::create_instance(app_name);
     m_dbg = vee::create_debug_utils_messenger();
