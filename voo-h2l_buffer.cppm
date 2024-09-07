@@ -15,8 +15,7 @@ public:
   h2l_buffer() = default;
   explicit h2l_buffer(vee::physical_device pd, unsigned sz)
       : m_hbuf{pd, sz}, m_sz{sz} {
-    m_buf =
-        vee::create_buffer(sz, vee::vertex_buffer, vee::transfer_dst_buffer);
+    m_buf = vee::create_buffer(sz, vee::buffer_usage::vertex_buffer, vee::buffer_usage::transfer_dst_buffer);
     m_mem = vee::create_local_buffer_memory(pd, *m_buf);
     vee::bind_buffer_memory(*m_buf, *m_mem);
   }
