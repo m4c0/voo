@@ -1,4 +1,5 @@
 export module voo:casein_thread;
+import :device_and_queue;
 import :frame_count;
 import :queue;
 import :swapchain_and_stuff;
@@ -49,6 +50,23 @@ protected:
     mtx::lock l{&m_mutex};
     m_init = true;
     m_cond.wake_all();
+  }
+
+  void main_loop(const char * app_name, auto fn) {
+    voo::device_and_queue dq { app_name };
+    while (!interrupted()) {
+      voo::swapchain_and_stuff sw { dq };
+      fn(dq, sw);
+    }
+  }
+  void ots_loop(voo::device_and_queue & dq, voo::swapchain_and_stuff & sw, auto && fn) {
+    auto q = dq.queue();
+    extent_loop(q, sw, [&] {
+      sw.queue_one_time_submit(q, [&](auto pcb) {
+        auto scb = sw.cmd_render_pass(pcb);
+        fn(*scb);
+      });
+    });
   }
 
   using thread::interrupted;

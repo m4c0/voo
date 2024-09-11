@@ -19,16 +19,11 @@ void create_instances(voo::h2l_buffer * insts) {
   static_cast<inst *>(*m)[1] = { -1, -1 };
 }
 
-static struct : public voo::casein_thread {
-  void run() override {
-    voo::device_and_queue dq { "voo-poc" };
-
-    voo::one_quad quad { dq };
-
-    vee::pipeline_layout pl = vee::create_pipeline_layout();
-
-    while (!interrupted()) {
-      voo::swapchain_and_stuff sw { dq };
+struct : public voo::casein_thread {
+  void run() {
+    main_loop("poc-voo", [&](auto & dq, auto & sw) {
+      voo::one_quad quad { dq };
+      vee::pipeline_layout pl = vee::create_pipeline_layout();
 
       constexpr const unsigned sz = 2 * sizeof(inst);
       auto u = voo::updater { dq.queue(), &create_instances, dq, sz };
@@ -51,17 +46,13 @@ static struct : public voo::casein_thread {
           },
       });
 
-      auto q = dq.queue();
-      extent_loop(q, sw, [&] {
-        sw.queue_one_time_submit(q, [&](auto pcb) {
-          auto scb = sw.cmd_render_pass(pcb);
-          vee::cmd_set_viewport(*scb, sw.extent());
-          vee::cmd_set_scissor(*scb, sw.extent());
-          vee::cmd_bind_gr_pipeline(*scb, *gp);
-          vee::cmd_bind_vertex_buffers(*scb, 1, u.data().local_buffer());
-          quad.run(scb, 0, 2);
-        });
+      ots_loop(dq, sw, [&](auto cb) {
+        vee::cmd_set_viewport(cb, sw.extent());
+        vee::cmd_set_scissor(cb, sw.extent());
+        vee::cmd_bind_gr_pipeline(cb, *gp);
+        vee::cmd_bind_vertex_buffers(cb, 1, u.data().local_buffer());
+        quad.run(cb, 0, 2);
       });
-    }
+    });
   }
 } t;
