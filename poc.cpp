@@ -23,12 +23,12 @@ struct : public voo::casein_thread {
   void run() {
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       voo::one_quad quad { dq };
-      vee::pipeline_layout pl = vee::create_pipeline_layout();
 
       constexpr const unsigned sz = 2 * sizeof(inst);
       auto u = voo::updater { dq.queue(), &create_instances, dq, sz };
       sith::run_guard ut { &u };
 
+      vee::pipeline_layout pl = vee::create_pipeline_layout();
       auto gp = vee::create_graphics_pipeline({
           .pipeline_layout = *pl,
           .render_pass = dq.render_pass(),
