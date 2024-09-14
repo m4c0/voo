@@ -19,17 +19,18 @@ export class h2l_image {
 public:
   h2l_image() = default;
   explicit h2l_image(vee::physical_device pd, unsigned w, unsigned h,
-                     bool rgba = true)
+                     vee::image_format fmt)
       : m_hbuf{pd, w * h * 4} {
     m_w = w;
     m_h = h;
-    m_img = vee::create_image({m_w, m_h}, rgba ? vee::image_format_srgba
-                                               : vee::image_format_r8);
+    m_img = vee::create_image({m_w, m_h}, fmt);
     m_mem = vee::create_local_image_memory(pd, *m_img);
     vee::bind_image_memory(*m_img, *m_mem);
-    m_iv = rgba ? vee::create_srgba_image_view(*m_img)
-                : vee::create_r8_image_view(*m_img);
+    m_iv = vee::create_image_view(*m_img, fmt);
   }
+  explicit h2l_image(vee::physical_device pd, unsigned w, unsigned h,
+                     bool rgba = true)
+      : h2l_image { pd, w, h, rgba ? vee::image_format_srgba : vee::image_format_r8 } {}
   explicit h2l_image(const voo::device_and_queue &dq, unsigned w, unsigned h,
                      bool rgba = true)
       : h2l_image{dq.physical_device(), w, h, rgba} {}
