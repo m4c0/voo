@@ -10,6 +10,7 @@ export import :h2l_yuv_image;
 export import :host_buffer;
 export import :mapmem;
 export import :one_quad;
+export import :one_quad_render;
 export import :sires_image;
 export import :shader;
 export import :swapchain_and_stuff;
