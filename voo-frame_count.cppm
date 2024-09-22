@@ -8,7 +8,7 @@ class frame_count {
   int m_count{};
 
 public:
-  auto &operator++() noexcept {
+  auto &operator++() {
     m_count++;
     return *this;
   }

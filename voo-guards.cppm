@@ -18,7 +18,7 @@ public:
     vee::begin_cmd_buf_one_time_submit(cb);
   }
 
-  [[nodiscard]] constexpr auto operator*() const noexcept { return *m_cb; }
+  [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
 
   static void build(vee::command_buffer cb, auto &&fn) {
     cmd_buf_one_time_submit pcb{cb};
@@ -34,7 +34,7 @@ public:
     vee::begin_cmd_buf_sim_use(cb);
   }
 
-  [[nodiscard]] constexpr auto operator*() const noexcept { return *m_cb; }
+  [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
 
   static void build(vee::command_buffer cb, auto &&fn) {
     cmd_buf_sim_use pcb{cb};
@@ -51,7 +51,7 @@ public:
     vee::cmd_begin_render_pass(rpb);
   }
 
-  [[nodiscard]] constexpr auto operator*() const noexcept { return *m_cb; }
+  [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
 
   static void build(const vee::render_pass_begin &rbp, auto &&fn) {
     cmd_render_pass pcb{rbp};
@@ -69,7 +69,7 @@ public:
     vee::begin_cmd_buf_render_pass_continue(cb, rp);
   }
 
-  [[nodiscard]] constexpr auto operator*() const noexcept { return *m_cb; }
+  [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
 
   static void build(vee::command_buffer cb, vee::render_pass::type rp,
                     auto &&fn) {

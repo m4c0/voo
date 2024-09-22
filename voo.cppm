@@ -51,8 +51,8 @@ public:
       , m_data{args...}
       , m_fn{fn} {}
 
-  [[nodiscard]] constexpr T &data() noexcept { return m_data; }
-  [[nodiscard]] constexpr const T &data() const noexcept { return m_data; }
+  [[nodiscard]] constexpr T &data() { return m_data; }
+  [[nodiscard]] constexpr const T &data() const { return m_data; }
 
   using update_thread::run;
   using update_thread::run_once;

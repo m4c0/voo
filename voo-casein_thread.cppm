@@ -18,7 +18,7 @@ export class casein_thread : public sith::thread {
   bool m_init{};
 
 protected:
-  [[nodiscard]] auto &resized() noexcept { return m_resized; }
+  [[nodiscard]] auto &resized() { return m_resized; }
 
   void extent_loop(auto fn) {
     frame_count fc{};

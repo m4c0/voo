@@ -41,9 +41,9 @@ public:
     vee::cmd_pipeline_barrier(cb, *m_img, vee::from_transfer_to_fragment);
   }
 
-  [[nodiscard]] auto host_memory() const noexcept { return m_hbuf.memory(); }
-  [[nodiscard]] auto iv() const noexcept { return *m_iv; }
-  [[nodiscard]] constexpr auto width() const noexcept { return m_w; }
-  [[nodiscard]] constexpr auto height() const noexcept { return m_h; }
+  [[nodiscard]] auto host_memory() const { return m_hbuf.memory(); }
+  [[nodiscard]] auto iv() const { return *m_iv; }
+  [[nodiscard]] constexpr auto width() const { return m_w; }
+  [[nodiscard]] constexpr auto height() const { return m_h; }
 };
 } // namespace voo

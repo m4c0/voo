@@ -28,7 +28,7 @@ public:
     vee::cmd_pipeline_barrier(cb, *m_buf, vee::from_transfer_to_vertex);
   }
 
-  [[nodiscard]] auto host_memory() const noexcept { return m_hbuf.memory(); }
-  [[nodiscard]] auto local_buffer() const noexcept { return *m_buf; }
+  [[nodiscard]] auto host_memory() const { return m_hbuf.memory(); }
+  [[nodiscard]] auto local_buffer() const { return *m_buf; }
 };
 } // namespace voo

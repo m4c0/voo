@@ -20,6 +20,6 @@ public:
   }
   void reset() { vee::reset_fence(*m_f); }
 
-  [[nodiscard]] constexpr auto operator*() const noexcept { return *m_f; }
+  [[nodiscard]] constexpr auto operator*() const { return *m_f; }
 };
 } // namespace voo

@@ -44,13 +44,13 @@ public:
     vee::cmd_pipeline_barrier(cb, *m_img, vee::from_transfer_to_fragment);
   }
 
-  [[nodiscard]] auto host_memory_y() const noexcept { return m_buf_y.memory(); }
-  [[nodiscard]] auto host_memory_u() const noexcept { return m_buf_u.memory(); }
-  [[nodiscard]] auto host_memory_v() const noexcept { return m_buf_v.memory(); }
+  [[nodiscard]] auto host_memory_y() const { return m_buf_y.memory(); }
+  [[nodiscard]] auto host_memory_u() const { return m_buf_u.memory(); }
+  [[nodiscard]] auto host_memory_v() const { return m_buf_v.memory(); }
 
-  [[nodiscard]] auto iv() const noexcept { return *m_iv; }
-  [[nodiscard]] auto conv() const noexcept { return *m_smp_conv; }
-  [[nodiscard]] constexpr auto width() const noexcept { return m_w; }
-  [[nodiscard]] constexpr auto height() const noexcept { return m_h; }
+  [[nodiscard]] auto iv() const { return *m_iv; }
+  [[nodiscard]] auto conv() const { return *m_smp_conv; }
+  [[nodiscard]] constexpr auto width() const { return m_w; }
+  [[nodiscard]] constexpr auto height() const { return m_h; }
 };
 } // namespace voo

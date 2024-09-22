@@ -34,19 +34,19 @@ public:
       : one_quad(dq.physical_device()) {}
 
   void run(vee::command_buffer cb, unsigned idx, unsigned inst = 1,
-           unsigned first_inst = 0) const noexcept {
+           unsigned first_inst = 0) const {
     vee::cmd_bind_vertex_buffers(cb, idx, *m_qbuf);
     vee::cmd_draw(cb, quad::v_count, inst, first_inst);
   }
   void run(const cmd_render_pass &scb, unsigned idx, unsigned inst = 1,
-           unsigned first_inst = 0) const noexcept {
+           unsigned first_inst = 0) const {
     run(*scb, idx, inst, first_inst);
   }
 
-  auto vertex_input_bind() const noexcept {
+  auto vertex_input_bind() const {
     return vee::vertex_input_bind(sizeof(float) * quad::v_size);
   }
-  auto vertex_attribute(unsigned binding) const noexcept {
+  auto vertex_attribute(unsigned binding) const {
     return vee::vertex_attribute_vec2(binding, 0);
   }
 };

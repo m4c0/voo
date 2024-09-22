@@ -21,6 +21,6 @@ public:
   mapmem(mapmem &&o) : m_dm{o.m_dm}, m_ptr{o.m_ptr} { o.m_ptr = nullptr; }
   mapmem &operator=(mapmem &&o) = delete;
 
-  [[nodiscard]] constexpr auto *operator*() noexcept { return m_ptr; }
+  [[nodiscard]] constexpr auto *operator*() { return m_ptr; }
 };
 } // namespace voo

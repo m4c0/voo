@@ -32,17 +32,10 @@ public:
   }
   ~device_and_queue() { vee::device_wait_idle(); }
 
-  [[nodiscard]] constexpr const auto physical_device() const noexcept {
-    return m_pd;
-  }
-  [[nodiscard]] constexpr const auto queue_family() const noexcept {
-    return m_qf;
-  }
-  [[nodiscard]] constexpr const auto render_pass() const noexcept {
-    return *m_rp;
-  }
-  [[nodiscard]] constexpr const auto surface() const noexcept { return *m_s; }
-
-  [[nodiscard]] constexpr auto *queue() noexcept { return &m_q; }
+  [[nodiscard]] constexpr const auto physical_device() const { return m_pd; }
+  [[nodiscard]] constexpr const auto queue_family() const { return m_qf; }
+  [[nodiscard]] constexpr const auto render_pass() const { return *m_rp; }
+  [[nodiscard]] constexpr const auto surface() const { return *m_s; }
+  [[nodiscard]] constexpr auto *queue() { return &m_q; }
 };
 } // namespace voo

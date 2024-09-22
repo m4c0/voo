@@ -26,7 +26,7 @@ class dirty_flag {
   bool m_dirty{false};
 
 public:
-  [[nodiscard]] constexpr bool get_and_clear() noexcept {
+  [[nodiscard]] constexpr bool get_and_clear() {
     auto r = m_dirty;
     m_dirty = false;
     return r;

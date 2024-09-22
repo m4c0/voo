@@ -66,15 +66,11 @@ public:
     m_cb = vee::allocate_primary_command_buffer(*m_cp);
   }
 
-  [[nodiscard]] constexpr const auto command_buffer() const noexcept {
-    return m_cb;
-  }
-  [[nodiscard]] constexpr const auto extent() const noexcept { return m_ext; }
-  [[nodiscard]] constexpr const auto framebuffer() const noexcept {
-    return *m_fbs[m_idx];
-  }
+  [[nodiscard]] constexpr const auto command_buffer() const { return m_cb; }
+  [[nodiscard]] constexpr const auto extent() const { return m_ext; }
+  [[nodiscard]] constexpr const auto framebuffer() const { return *m_fbs[m_idx]; }
 
-  [[nodiscard]] constexpr auto aspect() const noexcept {
+  [[nodiscard]] constexpr auto aspect() const {
     return static_cast<float>(m_ext.width) / static_cast<float>(m_ext.height);
   }
 
