@@ -10,11 +10,13 @@ import vee;
 
 namespace voo {
 export class casein_thread : public sith::thread {
+  volatile bool m_suspended {};
   volatile bool m_resized{};
   sith::run_guard m_run{};
 
   mtx::mutex m_mutex{};
   mtx::cond m_init_cond{};
+  mtx::cond m_sus_cond{};
   bool m_init{};
 
 protected:
@@ -24,12 +26,17 @@ protected:
     frame_count fc{};
 
     resized() = false;
-    while (!interrupted() && !resized()) {
+    while (!interrupted() && !resized() && !m_suspended) {
       ++fc;
       fn();
     }
 
     fc.print();
+
+    mtx::lock l { &m_mutex };
+    while (!interrupted() && m_suspended) {
+      m_sus_cond.wait(&l);
+    }
   }
   void extent_loop(queue *q, swapchain_and_stuff &sw, auto fn) {
     extent_loop([&] {
