@@ -14,7 +14,7 @@ export class casein_thread : public sith::thread {
   sith::run_guard m_run{};
 
   mtx::mutex m_mutex{};
-  mtx::cond m_cond{};
+  mtx::cond m_init_cond{};
   bool m_init{};
 
 protected:
@@ -43,13 +43,13 @@ protected:
   void wait_init() {
     mtx::lock l{&m_mutex};
     while (!interrupted() && !m_init) {
-      m_cond.wait(&l);
+      m_init_cond.wait(&l);
     }
   }
   void release_init_lock() {
     mtx::lock l{&m_mutex};
     m_init = true;
-    m_cond.wake_all();
+    m_init_cond.wake_all();
   }
 
   void main_loop(const char * app_name, auto fn) {
