@@ -15,7 +15,7 @@ namespace voo {
   export class one_quad_render {
     hai::cstr m_vert_name;
     hai::cstr m_frag_name;
-    const voo::device_and_queue * m_dq;
+    const vee::render_pass::type m_rp;
     const vee::pipeline_layout::type m_pl;
 
     voo::one_quad m_quad;
@@ -32,7 +32,7 @@ namespace voo {
       m_last_updated = current_mtime();
       return vee::create_graphics_pipeline({
           .pipeline_layout = m_pl,
-          .render_pass = m_dq->render_pass(),
+          .render_pass = m_rp,
           .shaders {
               voo::shader(m_vert_name).pipeline_vert_stage(),
               voo::shader(m_frag_name).pipeline_frag_stage(),
@@ -44,11 +44,14 @@ namespace voo {
 
   public:
     one_quad_render(jute::view shader, const voo::device_and_queue * dq, const vee::pipeline_layout::type pl)
+      : one_quad_render { shader, dq->physical_device(), dq->render_pass(), pl } {}
+
+    one_quad_render(jute::view shader, vee::physical_device pd, vee::render_pass::type rp, const vee::pipeline_layout::type pl)
         : m_vert_name { (shader + ".vert.spv").cstr() }
         , m_frag_name { (shader + ".frag.spv").cstr() }
-        , m_dq { dq }
+        , m_rp { rp }
         , m_pl { pl }
-        , m_quad { *dq }
+        , m_quad { pd }
         , m_pipeline { create_pipeline() } {}
 
     void run(vee::command_buffer cb, vee::extent ext) {
