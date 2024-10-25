@@ -70,7 +70,7 @@ protected:
     auto q = dq.queue();
     extent_loop(q, sw, [&] {
       sw.queue_one_time_submit(q, [&](auto pcb) {
-        auto scb = sw.cmd_render_pass(pcb);
+        auto scb = sw.cmd_render_pass({ *pcb });
         fn(*scb);
       });
     });

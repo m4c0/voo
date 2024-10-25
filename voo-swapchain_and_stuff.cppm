@@ -84,12 +84,6 @@ public:
     rpb.extent = extent();
     return voo::cmd_render_pass(rpb);
   }
-  auto cmd_render_pass(const cmd_buf_one_time_submit &pcb) const {
-    return cmd_render_pass({
-        .command_buffer = *pcb,
-        .clear_color = {{0.1, 0.2, 0.3, 1.0}},
-    });
-  }
 
   void queue_submit(queue *q) {
     q->queue_submit({
