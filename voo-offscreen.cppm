@@ -86,5 +86,12 @@ export namespace voo::offscreen {
       vee::cmd_pipeline_barrier(cb, m_colour.image(), vee::from_pipeline_to_host);
       vee::cmd_copy_image_to_buffer(cb, m_ext, m_colour.image(), m_host.buffer());
     }
+
+    auto render_pass_begin(vee::render_pass_begin rpb) {
+      rpb.render_pass = render_pass();
+      rpb.framebuffer = framebuffer();
+      rpb.extent = extent();
+      return rpb;
+    }
   };
 } // namespace voo::offscreen
