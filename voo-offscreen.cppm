@@ -16,8 +16,8 @@ export namespace voo::offscreen {
       m_iv = vee::create_srgba_image_view(*m_img);
     }
 
-    [[nodiscard]] auto image_view() const { return *m_iv; }
-    [[nodiscard]] auto image() const { return *m_img; }
+    [[nodiscard]] constexpr auto image_view() const { return *m_iv; }
+    [[nodiscard]] constexpr auto image() const { return *m_img; }
   };
 
   class depth_buffer {
@@ -33,8 +33,8 @@ export namespace voo::offscreen {
       m_iv = vee::create_srgba_image_view(*m_img);
     }
 
-    [[nodiscard]] auto image_view() const { return *m_iv; }
-    [[nodiscard]] auto image() const { return *m_img; }
+    [[nodiscard]] constexpr auto image_view() const { return *m_iv; }
+    [[nodiscard]] constexpr auto image() const { return *m_img; }
   };
 
   class host_buffer {
@@ -48,7 +48,43 @@ export namespace voo::offscreen {
       vee::bind_buffer_memory(*m_buf, *m_mem);
     }
 
-    [[nodiscard]] auto buffer() const { return *m_buf; }
+    [[nodiscard]] constexpr auto buffer() const { return *m_buf; }
     [[nodiscard]] auto map() const { return voo::mapmem(*m_mem); }
+  };
+
+  class buffers {
+    colour_buffer m_colour;
+    depth_buffer m_depth;
+    host_buffer m_host;
+
+    // TODO: voo::framebuffer with rp+fb+ext - they are always used together
+    vee::render_pass m_rp;
+    vee::framebuffer m_fb;
+    vee::extent m_ext;
+
+  public:
+    buffers(vee::physical_device pd, vee::extent ext)
+        : m_colour { pd, ext }
+        , m_depth { pd, ext }
+        , m_host { pd, ext }
+        , m_rp { vee::create_render_pass({ { vee::create_colour_attachment() } }) }
+        , m_fb { vee::create_framebuffer({
+              .physical_device = pd,
+              .render_pass = *m_rp,
+              .attachments = { { m_colour.image_view(), m_depth.image_view() } },
+              .extent = ext,
+          }) }
+        , m_ext { ext } {}
+
+    [[nodiscard]] constexpr auto extent() const { return m_ext; }
+    [[nodiscard]] constexpr auto framebuffer() const { return *m_fb; }
+    [[nodiscard]] constexpr auto render_pass() const { return *m_rp; }
+
+    [[nodiscard]] auto map_host() const { return m_host.map(); }
+
+    void cmd_copy_to_host(vee::command_buffer cb) {
+      vee::cmd_pipeline_barrier(cb, m_colour.image(), vee::from_pipeline_to_host);
+      vee::cmd_copy_image_to_buffer(cb, m_ext, m_colour.image(), m_host.buffer());
+    }
   };
 } // namespace voo::offscreen
