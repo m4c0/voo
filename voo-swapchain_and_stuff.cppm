@@ -78,11 +78,14 @@ public:
     return m_idx = vee::acquire_next_image(*m_swc, *m_img_available_sema);
   }
 
-  auto cmd_render_pass(vee::render_pass_begin rpb) const {
+  auto render_pass_begin(vee::render_pass_begin rpb) const {
     rpb.render_pass = m_rp;
     rpb.framebuffer = framebuffer();
     rpb.extent = extent();
-    return voo::cmd_render_pass(rpb);
+    return rpb;
+  }
+  auto cmd_render_pass(vee::render_pass_begin rpb) const {
+    return voo::cmd_render_pass(render_pass_begin(rpb));
   }
 
   void queue_submit(queue *q) {
