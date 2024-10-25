@@ -1,6 +1,7 @@
 export module voo:swapchain_and_stuff;
 import :guards;
 import :device_and_queue;
+import :offscreen;
 import :queue;
 import hai;
 import vee;
@@ -10,42 +11,36 @@ template <typename T, typename A>
 concept is_fn_taking_const_ref = requires(T t, const A &a) { t(a); };
 
 export class swapchain_and_stuff {
-  // Depth buffer
-  vee::image m_dimg;
-  vee::device_memory m_dmem;
-  vee::image_view m_div;
-
   // Sync stuff
   vee::semaphore m_img_available_sema = vee::create_semaphore();
   vee::semaphore m_rnd_finished_sema = vee::create_semaphore();
   vee::fence m_f = vee::create_fence_signaled();
 
-  vee::swapchain m_swc;
-  vee::extent m_ext;
   vee::render_pass::type m_rp;
+  vee::extent m_ext;
+  offscreen::depth_buffer m_depth;
+
+  vee::swapchain m_swc;
+  vee::command_pool m_cp;
+  vee::command_buffer m_cb;
 
   hai::array<vee::image_view> m_civs;
   hai::array<vee::framebuffer> m_fbs;
 
-  vee::command_pool m_cp;
-  vee::command_buffer m_cb;
-
   unsigned m_idx;
 
 public:
-  swapchain_and_stuff(const device_and_queue &dq)
+  explicit swapchain_and_stuff(const device_and_queue &dq)
+      : swapchain_and_stuff(dq, dq.render_pass()) {}
+  swapchain_and_stuff(const device_and_queue &dq, vee::render_pass::type rp)
       : swapchain_and_stuff(dq.physical_device(), dq.surface(),
                             dq.render_pass(), dq.queue_family()) {}
   swapchain_and_stuff(vee::physical_device pd, vee::surface::type s,
                       vee::render_pass::type rp, unsigned qf)
-      : m_rp{rp} {
-    m_dimg = vee::create_depth_image(pd, s);
-    m_dmem = vee::create_local_image_memory(pd, *m_dimg);
-    vee::bind_image_memory(*m_dimg, *m_dmem);
-    m_div = vee::create_depth_image_view(*m_dimg);
-
+      : m_rp{rp}
+      , m_ext { vee::get_surface_capabilities(pd, s).currentExtent }
+      , m_depth { pd, m_ext } {
     m_swc = vee::create_swapchain(pd, s);
-    m_ext = vee::get_surface_capabilities(pd, s).currentExtent;
 
     auto swc_imgs = vee::get_swapchain_images(*m_swc);
     m_civs = hai::array<vee::image_view>{swc_imgs.size()};
@@ -57,7 +52,7 @@ public:
           .physical_device = pd,
           .surface = s,
           .render_pass = m_rp,
-          .attachments = {{ *m_civs[i], *m_div }},
+          .attachments = {{ *m_civs[i], m_depth.image_view() }},
       });
     }
 
