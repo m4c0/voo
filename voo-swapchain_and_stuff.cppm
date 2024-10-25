@@ -32,16 +32,19 @@ export class swapchain_and_stuff {
 public:
   explicit swapchain_and_stuff(const device_and_queue &dq)
       : swapchain_and_stuff(dq, dq.render_pass()) {}
+
   swapchain_and_stuff(const device_and_queue &dq, vee::render_pass::type rp)
       : swapchain_and_stuff(dq.physical_device(), dq.surface(),
                             dq.render_pass(), dq.queue_family()) {}
+
   swapchain_and_stuff(vee::physical_device pd, vee::surface::type s,
                       vee::render_pass::type rp, unsigned qf)
       : m_rp{rp}
       , m_ext { vee::get_surface_capabilities(pd, s).currentExtent }
-      , m_depth { pd, m_ext } {
-    m_swc = vee::create_swapchain(pd, s);
-
+      , m_depth { pd, m_ext }
+      , m_swc { vee::create_swapchain(pd, s) }
+      , m_cp { vee::create_command_pool(qf) }
+      , m_cb { vee::allocate_primary_command_buffer(*m_cp) } {
     auto swc_imgs = vee::get_swapchain_images(*m_swc);
     m_civs = hai::array<vee::image_view>{swc_imgs.size()};
     m_fbs = hai::array<vee::framebuffer>{swc_imgs.size()};
@@ -55,9 +58,6 @@ public:
           .attachments = {{ *m_civs[i], m_depth.image_view() }},
       });
     }
-
-    m_cp = vee::create_command_pool(qf);
-    m_cb = vee::allocate_primary_command_buffer(*m_cp);
   }
 
   [[nodiscard]] constexpr const auto command_buffer() const { return m_cb; }
