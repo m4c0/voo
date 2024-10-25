@@ -9,6 +9,7 @@ export import :h2l_image;
 export import :h2l_yuv_image;
 export import :host_buffer;
 export import :mapmem;
+export import :offscreen;
 export import :one_quad;
 export import :one_quad_render;
 export import :sires_image;
