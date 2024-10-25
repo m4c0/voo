@@ -57,8 +57,7 @@ public:
           .physical_device = pd,
           .surface = s,
           .render_pass = m_rp,
-          .image_buffer = *m_civs[i],
-          .depth_buffer = *m_div,
+          .attachments = {{ *m_civs[i], *m_div }},
       });
     }
 
