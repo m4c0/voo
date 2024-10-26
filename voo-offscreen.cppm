@@ -18,6 +18,11 @@ export namespace voo::offscreen {
 
     [[nodiscard]] constexpr auto image_view() const { return *m_iv; }
     [[nodiscard]] constexpr auto image() const { return *m_img; }
+
+    void cmd_copy_to_host(vee::command_buffer cb, vee::offset ofs, vee::extent ext, vee::buffer::type host) {
+      vee::cmd_pipeline_barrier(cb, *m_img, vee::from_pipeline_to_host);
+      vee::cmd_copy_image_to_buffer(cb, ofs, ext, *m_img, host);
+    }
   };
 
   class depth_buffer {
@@ -83,8 +88,7 @@ export namespace voo::offscreen {
     [[nodiscard]] auto map_host() const { return m_host.map(); }
 
     void cmd_copy_to_host(vee::command_buffer cb) {
-      vee::cmd_pipeline_barrier(cb, m_colour.image(), vee::from_pipeline_to_host);
-      vee::cmd_copy_image_to_buffer(cb, m_ext, m_colour.image(), m_host.buffer());
+      m_colour.cmd_copy_to_host(cb, {}, m_ext, m_host.buffer());
     }
 
     auto render_pass_begin(vee::render_pass_begin rpb) {
