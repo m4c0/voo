@@ -44,7 +44,7 @@ public:
                       vee::render_pass::type rp, unsigned qf,
                       hai::array<vee::image_view::type> extras = {})
       : m_rp{rp}
-      , m_ext { vee::get_surface_capabilities(pd, s).currentExtent }
+      , m_ext { extent_of(pd, s) }
       , m_depth { pd, m_ext }
       , m_swc { vee::create_swapchain(pd, s) }
       , m_cp { vee::create_command_pool(qf) }

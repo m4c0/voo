@@ -5,8 +5,8 @@ import mtx;
 import no;
 import vee;
 
-namespace voo {
-export class device_and_queue : no::no {
+export namespace voo {
+class device_and_queue : no::no {
   vee::instance m_i;
   vee::debug_utils_messenger m_dbg;
   vee::surface m_s;
@@ -38,4 +38,11 @@ public:
   [[nodiscard]] constexpr const auto surface() const { return *m_s; }
   [[nodiscard]] constexpr auto *queue() { return &m_q; }
 };
+
+auto extent_of(vee::physical_device pd, vee::surface::type s) {
+  return vee::get_surface_capabilities(pd, s).currentExtent;
+}
+auto extent_of(device_and_queue & dq) {
+  return extent_of(dq.physical_device(), dq.surface());
+}
 } // namespace voo
