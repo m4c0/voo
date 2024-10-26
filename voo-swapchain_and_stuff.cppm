@@ -30,15 +30,19 @@ export class swapchain_and_stuff {
   unsigned m_idx;
 
 public:
-  explicit swapchain_and_stuff(const device_and_queue &dq)
-      : swapchain_and_stuff(dq, dq.render_pass()) {}
+  explicit swapchain_and_stuff(const device_and_queue &dq,
+                               hai::array<vee::image_view::type> extras = {})
+      : swapchain_and_stuff(dq, dq.render_pass(), traits::move(extras)) {}
 
-  swapchain_and_stuff(const device_and_queue &dq, vee::render_pass::type rp)
+  swapchain_and_stuff(const device_and_queue &dq, vee::render_pass::type rp,
+                      hai::array<vee::image_view::type> extras = {})
       : swapchain_and_stuff(dq.physical_device(), dq.surface(),
-                            dq.render_pass(), dq.queue_family()) {}
+                            dq.render_pass(), dq.queue_family(),
+                            traits::move(extras)) {}
 
   swapchain_and_stuff(vee::physical_device pd, vee::surface::type s,
-                      vee::render_pass::type rp, unsigned qf)
+                      vee::render_pass::type rp, unsigned qf,
+                      hai::array<vee::image_view::type> extras = {})
       : m_rp{rp}
       , m_ext { vee::get_surface_capabilities(pd, s).currentExtent }
       , m_depth { pd, m_ext }
@@ -51,11 +55,21 @@ public:
 
     for (auto i = 0; i < swc_imgs.size(); i++) {
       m_civs[i] = vee::create_rgba_image_view(swc_imgs[i], pd, s);
+    }
+
+    for (auto i = 0; i < swc_imgs.size(); i++) {
+      hai::array<vee::image_view::type> attachments { extras.size() + 2 };
+      for (auto j = 0; j < extras.size(); j++) {
+        attachments[j + 1] = extras[j];
+      }
+      attachments[0] = *m_civs[i];
+      attachments[extras.size() + 1] = m_depth.image_view();
+
       m_fbs[i] = vee::create_framebuffer({
           .physical_device = pd,
           .surface = s,
           .render_pass = m_rp,
-          .attachments = {{ *m_civs[i], m_depth.image_view() }},
+          .attachments = traits::move(attachments),
       });
     }
   }
