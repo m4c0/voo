@@ -13,9 +13,10 @@ import vee;
 
 namespace voo {
   export class one_quad_render {
+    using blends_t = decltype(vee::gr_pipeline_params::blends);
     hai::cstr m_vert_name;
     hai::cstr m_frag_name;
-    unsigned m_attachments;
+    blends_t m_blends;
     const vee::render_pass::type m_rp;
     const vee::pipeline_layout::type m_pl;
 
@@ -34,7 +35,7 @@ namespace voo {
       return vee::create_graphics_pipeline({
           .pipeline_layout = m_pl,
           .render_pass = m_rp,
-          .attachment_count = m_attachments,
+          .blends = m_blends,
           .shaders {
               voo::shader(m_vert_name).pipeline_vert_stage(),
               voo::shader(m_frag_name).pipeline_frag_stage(),
@@ -48,10 +49,11 @@ namespace voo {
     one_quad_render(jute::view shader, const voo::device_and_queue * dq, const vee::pipeline_layout::type pl)
       : one_quad_render { shader, dq->physical_device(), dq->render_pass(), pl } {}
 
-    one_quad_render(jute::view shader, vee::physical_device pd, vee::render_pass::type rp, const vee::pipeline_layout::type pl, unsigned blends = 1)
+    one_quad_render(jute::view shader, vee::physical_device pd, vee::render_pass::type rp, const vee::pipeline_layout::type pl,
+                    blends_t blends = { vee::colour_blend_classic() })
         : m_vert_name { (shader + ".vert.spv").cstr() }
         , m_frag_name { (shader + ".frag.spv").cstr() }
-        , m_attachments { blends }
+        , m_blends { blends }
         , m_rp { rp }
         , m_pl { pl }
         , m_quad { pd }
