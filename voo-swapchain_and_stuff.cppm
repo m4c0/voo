@@ -37,7 +37,7 @@ public:
   swapchain_and_stuff(const device_and_queue &dq, vee::render_pass::type rp,
                       hai::array<vee::image_view::type> extras = {})
       : swapchain_and_stuff(dq.physical_device(), dq.surface(),
-                            dq.render_pass(), dq.queue_family(),
+                            rp, dq.queue_family(),
                             traits::move(extras)) {}
 
   swapchain_and_stuff(vee::physical_device pd, vee::surface::type s,
