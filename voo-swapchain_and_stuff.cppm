@@ -94,7 +94,7 @@ public:
     return rpb;
   }
   auto cmd_render_pass(vee::render_pass_begin rpb) const {
-    return voo::cmd_render_pass(render_pass_begin(rpb));
+    return voo::cmd_render_pass(render_pass_begin(traits::move(rpb)));
   }
 
   void queue_submit(queue *q) {
