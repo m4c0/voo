@@ -13,7 +13,7 @@ export namespace voo::offscreen {
       m_img = vee::create_renderable_image(ext, fmt);
       m_mem = vee::create_local_image_memory(pd, *m_img);
       vee::bind_image_memory(*m_img, *m_mem);
-      m_iv = vee::create_srgba_image_view(*m_img);
+      m_iv = vee::create_image_view(*m_img, fmt);
     }
 
     [[nodiscard]] constexpr auto image_view() const { return *m_iv; }
