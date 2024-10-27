@@ -9,8 +9,8 @@ export namespace voo::offscreen {
     vee::image_view m_iv;
 
   public:
-    colour_buffer(vee::physical_device pd, vee::extent ext) {
-      m_img = vee::create_renderable_image(ext);
+    colour_buffer(vee::physical_device pd, vee::extent ext, vee::image_format fmt) {
+      m_img = vee::create_renderable_image(ext, fmt);
       m_mem = vee::create_local_image_memory(pd, *m_img);
       vee::bind_image_memory(*m_img, *m_mem);
       m_iv = vee::create_srgba_image_view(*m_img);
@@ -68,8 +68,8 @@ export namespace voo::offscreen {
     vee::extent m_ext;
 
   public:
-    buffers(vee::physical_device pd, vee::extent ext)
-        : m_colour { pd, ext }
+    buffers(vee::physical_device pd, vee::extent ext, vee::image_format img)
+        : m_colour { pd, ext, img }
         , m_depth { pd, ext }
         , m_host { pd, ext }
         , m_rp { vee::create_render_pass({ { vee::create_colour_attachment() } }) }
