@@ -59,10 +59,11 @@ namespace voo {
         , m_quad { pd }
         , m_pipeline { create_pipeline() } {}
 
-    void run(vee::command_buffer cb, vee::extent ext) {
+    void run(vee::command_buffer cb, vee::extent ext, auto fn) {
       vee::cmd_set_viewport(cb, ext);
       vee::cmd_set_scissor(cb, ext);
       vee::cmd_bind_gr_pipeline(cb, *m_pipeline);
+      fn();
       m_quad.run(cb, 0, 1);
 
       if (m_last_updated < current_mtime()) {
@@ -70,6 +71,9 @@ namespace voo {
         m_pipeline_old = traits::move(m_pipeline);
         m_pipeline = create_pipeline();
       }
+    }
+    void run(vee::command_buffer cb, vee::extent ext) {
+      run(cb, ext, [] {});
     }
   };
 } // namespace voo
