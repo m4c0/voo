@@ -1,6 +1,5 @@
 export module voo:device_and_queue;
 import :queue;
-import casein;
 import mtx;
 import no;
 import vee;
@@ -9,7 +8,7 @@ export namespace voo {
 class device_and_queue : no::no {
   vee::instance m_i;
   vee::debug_utils_messenger m_dbg;
-  vee::surface m_s;
+  vee::surface m_s {};
   vee::physical_device m_pd;
   vee::device m_d;
   vee::render_pass m_rp;
@@ -17,11 +16,10 @@ class device_and_queue : no::no {
   unsigned m_qf;
 
 public:
-  device_and_queue() : device_and_queue(casein::window_title.cstr().begin()) {}
-  device_and_queue(const char *app_name) {
+  device_and_queue(const char *app_name, auto * native_ptr) {
     m_i = vee::create_instance(app_name);
     m_dbg = vee::create_debug_utils_messenger();
-    m_s = vee::create_surface(casein::native_ptr);
+    if (native_ptr) m_s = vee::create_surface(native_ptr);
     auto [pd, qf] = vee::find_physical_device_with_universal_queue(*m_s);
     m_pd = pd;
     m_qf = qf;

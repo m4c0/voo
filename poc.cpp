@@ -28,7 +28,7 @@ struct thread : public sith::thread {
   }
 
   void run() {
-    voo::device_and_queue dq { "poc-voo" };
+    voo::device_and_queue dq { "poc-voo", casein::native_ptr };
     while (!interrupted()) {
       voo::swapchain_and_stuff sw { dq };
       voo::one_quad quad { dq };
