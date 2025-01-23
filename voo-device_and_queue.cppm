@@ -16,7 +16,7 @@ class device_and_queue : no::no {
   unsigned m_qf;
 
 public:
-  device_and_queue(const char *app_name, auto * native_ptr) {
+  device_and_queue(const char *app_name, auto native_ptr) {
     m_i = vee::create_instance(app_name);
     m_dbg = vee::create_debug_utils_messenger();
     if (native_ptr) m_s = vee::create_surface(native_ptr);
