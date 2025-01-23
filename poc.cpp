@@ -3,7 +3,6 @@
 #pragma leco add_shader "poc.frag"
 
 import casein;
-import mtx;
 import rng;
 import sith;
 import vee;
@@ -19,9 +18,19 @@ void create_instances(voo::h2l_buffer * insts) {
   static_cast<inst *>(*m)[1] = { -1, -1 };
 }
 
-struct : public voo::casein_thread {
+// Use "vapp" for more standardised control
+struct thread : public sith::thread {
+  sith::run_guard m_run{};
+
+  thread() {
+    casein::handle(casein::CREATE_WINDOW, [this] { m_run = sith::run_guard{this}; });
+    casein::handle(casein::QUIT, [this] { m_run = {}; });
+  }
+
   void run() {
-    main_loop("poc-voo", [&](auto & dq, auto & sw) {
+    voo::device_and_queue dq { "poc-voo" };
+    while (!interrupted()) {
+      voo::swapchain_and_stuff sw { dq };
       voo::one_quad quad { dq };
 
       constexpr const unsigned sz = 2 * sizeof(inst);
@@ -46,13 +55,18 @@ struct : public voo::casein_thread {
           },
       });
 
-      ots_loop(dq, sw, [&](auto cb) {
-        vee::cmd_set_viewport(cb, sw.extent());
-        vee::cmd_set_scissor(cb, sw.extent());
-        vee::cmd_bind_gr_pipeline(cb, *gp);
-        vee::cmd_bind_vertex_buffers(cb, 1, u.data().local_buffer());
-        quad.run(cb, 0, 2);
-      });
-    });
+      while (!interrupted()) {
+        sw.acquire_next_image();
+        sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
+          auto scb = sw.cmd_render_pass({ *pcb });
+          vee::cmd_set_viewport(*pcb, sw.extent());
+          vee::cmd_set_scissor(*pcb, sw.extent());
+          vee::cmd_bind_gr_pipeline(*pcb, *gp);
+          vee::cmd_bind_vertex_buffers(*pcb, 1, u.data().local_buffer());
+          quad.run(*pcb, 0, 2);
+        });
+        sw.queue_present(dq.queue());
+      }
+    }
   }
 } t;

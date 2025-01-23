@@ -1,5 +1,4 @@
 export module voo;
-export import :casein_thread;
 export import :command_pool;
 export import :device_and_queue;
 export import :fence;
@@ -21,8 +20,6 @@ export import :updater;
 import jute;
 import traits;
 import vee;
-
-#pragma leco add_impl casein_thread
 
 // TODO: move these back to their parts once clang on Windows accept it
 export namespace voo {
