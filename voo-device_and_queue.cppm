@@ -16,10 +16,21 @@ class device_and_queue : no::no {
   unsigned m_qf;
 
 public:
+  device_and_queue(const char *app_name) {
+    m_i = vee::create_instance(app_name);
+    m_dbg = vee::create_debug_utils_messenger();
+    auto [pd, qf] = vee::find_physical_device_with_universal_queue(nullptr);
+    m_pd = pd;
+    m_qf = qf;
+
+    m_d = vee::create_single_queue_device(pd, qf);
+    m_rp = vee::create_render_pass(pd, nullptr);
+    m_q = voo::queue{qf};
+  }
   device_and_queue(const char *app_name, auto native_ptr) {
     m_i = vee::create_instance(app_name);
     m_dbg = vee::create_debug_utils_messenger();
-    if (native_ptr) m_s = vee::create_surface(native_ptr);
+    m_s = vee::create_surface(native_ptr);
     auto [pd, qf] = vee::find_physical_device_with_universal_queue(*m_s);
     m_pd = pd;
     m_qf = qf;
