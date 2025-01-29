@@ -72,7 +72,7 @@ export namespace voo::offscreen {
         : m_colour { pd, ext, img }
         , m_depth { pd, ext }
         , m_host { pd, ext }
-        , m_rp { vee::create_render_pass({ { vee::create_colour_attachment(img, ly) } }) }
+        , m_rp { vee::create_render_pass(img, ly) }
         , m_fb { vee::create_framebuffer({
               .physical_device = pd,
               .render_pass = *m_rp,
