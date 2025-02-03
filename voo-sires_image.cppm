@@ -18,7 +18,7 @@ export auto load_sires_image(jute::view file, vee::physical_device pd) {
       .map([file, pd](auto &&img) {
         unsigned w = img.width;
         unsigned h = img.height;
-        auto m_img = h2l_image{pd, w, h};
+        auto m_img = h2l_image { pd, w, h, VK_FORMAT_R8G8B8A8_SRGB };
 
         {
           mapmem m{m_img.host_memory()};

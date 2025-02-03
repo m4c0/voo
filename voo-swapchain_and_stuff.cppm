@@ -54,7 +54,7 @@ public:
     m_fbs = hai::array<vee::framebuffer>{swc_imgs.size()};
 
     for (auto i = 0; i < swc_imgs.size(); i++) {
-      m_civs[i] = vee::create_rgba_image_view(swc_imgs[i], pd, s);
+      m_civs[i] = vee::create_image_view_for_surface(swc_imgs[i], pd, s);
     }
 
     for (auto i = 0; i < swc_imgs.size(); i++) {
