@@ -8,11 +8,13 @@ export namespace voo {
     vee::swapchain m_swc;
     hai::array<vee::image_view> m_civs;
     hai::array<vee::framebuffer> m_fbs;
+    vee::extent m_ext;
     unsigned m_idx;
 
   public:
     swapchain(vee::physical_device pd, vee::surface::type s)
       : m_swc { vee::create_swapchain(pd, s) }
+      , m_ext { extent_of(pd, s) }
     {
       auto swc_imgs = vee::get_swapchain_images(*m_swc);
       m_civs = hai::array<vee::image_view> { swc_imgs.size() };
@@ -24,6 +26,7 @@ export namespace voo {
     }
 
     [[nodiscard]] constexpr auto count() const { return m_civs.size(); }
+    [[nodiscard]] constexpr auto extent() const { return m_ext; }
     [[nodiscard]] constexpr auto framebuffer() const { return *m_fbs[m_idx]; }
     [[nodiscard]] constexpr auto image_view(unsigned i) const { return *m_civs[i]; }
 

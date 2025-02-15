@@ -15,12 +15,11 @@ concept is_fn_taking_const_ref = requires(T t, const A &a) { t(a); };
 
 export class swapchain_and_stuff {
   voo::frame_sync_stuff m_sync;
+  voo::swapchain m_swc;
 
   vee::render_pass::type m_rp;
-  vee::extent m_ext;
   offscreen::depth_buffer m_depth;
 
-  voo::swapchain m_swc;
   voo::single_cb m_cb;
 
 public:
@@ -38,9 +37,8 @@ public:
                       vee::render_pass::type rp, unsigned qf,
                       hai::array<vee::image_view::type> extras = {})
       : m_rp{rp}
-      , m_ext { extent_of(pd, s) }
-      , m_depth { pd, m_ext }
       , m_swc { pd, s }
+      , m_depth { pd, m_swc.extent() }
       , m_cb { qf } {
     for (auto i = 0; i < m_swc.count(); i++) {
       hai::array<vee::image_view::type> attachments { extras.size() + 2 };
