@@ -12,6 +12,10 @@ export namespace voo {
     unsigned m_idx;
 
   public:
+    explicit swapchain(const device_and_queue & dq)
+      : swapchain { dq.physical_device(), dq.surface() }
+    {}
+
     swapchain(vee::physical_device pd, vee::surface::type s)
       : m_swc { vee::create_swapchain(pd, s) }
       , m_ext { extent_of(pd, s) }
