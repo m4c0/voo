@@ -14,10 +14,11 @@ template <typename T, typename A>
 concept is_fn_taking_const_ref = requires(T t, const A &a) { t(a); };
 
 export class swapchain_and_stuff {
+  vee::render_pass::type m_rp;
+
   voo::frame_sync_stuff m_sync;
   voo::swapchain m_swc;
 
-  vee::render_pass::type m_rp;
   offscreen::depth_buffer m_depth;
 
   voo::single_cb m_cb;
@@ -57,11 +58,11 @@ public:
   }
 
   [[nodiscard]] constexpr const auto command_buffer() const { return m_cb.cb(); }
-  [[nodiscard]] constexpr const auto extent() const { return m_ext; }
+  [[nodiscard]] constexpr const auto extent() const { return m_swc.extent(); }
   [[nodiscard]] constexpr const auto framebuffer() const { return m_swc.framebuffer(); }
 
   [[nodiscard]] constexpr auto aspect() const {
-    return static_cast<float>(m_ext.width) / static_cast<float>(m_ext.height);
+    return static_cast<float>(extent().width) / static_cast<float>(extent().height);
   }
 
   void acquire_next_image() {
