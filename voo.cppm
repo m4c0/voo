@@ -16,6 +16,7 @@ export import :shader;
 export import :single_cb;
 export import :single_dset;
 export import :sires_image;
+export import :swapchain;
 export import :swapchain_and_stuff;
 export import :queue;
 export import :update_thread;
