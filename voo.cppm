@@ -2,6 +2,7 @@ export module voo;
 export import :command_pool;
 export import :device_and_queue;
 export import :fence;
+export import :frame_sync_stuff;
 export import :guards;
 export import :h2l_buffer;
 export import :h2l_image;

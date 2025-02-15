@@ -1,6 +1,7 @@
 export module voo:swapchain_and_stuff;
 import :guards;
 import :device_and_queue;
+import :frame_sync_stuff;
 import :offscreen;
 import :queue;
 import :single_cb;
@@ -12,10 +13,7 @@ template <typename T, typename A>
 concept is_fn_taking_const_ref = requires(T t, const A &a) { t(a); };
 
 export class swapchain_and_stuff {
-  // Sync stuff
-  vee::semaphore m_img_available_sema = vee::create_semaphore();
-  vee::semaphore m_rnd_finished_sema = vee::create_semaphore();
-  vee::fence m_f = vee::create_fence_signaled();
+  voo::frame_sync_stuff m_sync;
 
   vee::render_pass::type m_rp;
   vee::extent m_ext;
@@ -82,8 +80,8 @@ public:
   }
 
   auto acquire_next_image() {
-    vee::wait_and_reset_fence(*m_f);
-    return m_idx = vee::acquire_next_image(*m_swc, *m_img_available_sema);
+    m_sync.wait_and_reset_fence();
+    return m_idx = vee::acquire_next_image(*m_swc, m_sync.img_available_sema());
   }
 
   auto render_pass_begin(vee::render_pass_begin rpb) const {
@@ -96,18 +94,11 @@ public:
     return voo::cmd_render_pass(render_pass_begin(traits::move(rpb)));
   }
 
-  void queue_submit(queue *q) {
-    q->queue_submit({
-        .fence = *m_f,
-        .command_buffer = m_cb.cb(),
-        .wait_semaphore = *m_img_available_sema,
-        .signal_semaphore = *m_rnd_finished_sema,
-    });
-  }
+  void queue_submit(queue *q) { m_sync.queue_submit(q, m_cb.cb()); }
   void queue_present(queue *q) {
     q->queue_present({
         .swapchain = *m_swc,
-        .wait_semaphore = *m_rnd_finished_sema,
+        .wait_semaphore = m_sync.rnd_finished_sema(),
         .image_index = m_idx,
     });
   }
