@@ -1,4 +1,7 @@
 export module voo:guards;
+import :frame_sync_stuff;
+import :queue;
+import :swapchain;
 import hai;
 import vee;
 
@@ -77,4 +80,20 @@ public:
     fn(pcb);
   }
 };
+
+  export class present_guard {
+    queue * m_q;
+    swapchain * m_swc;
+    frame_sync_stuff * m_sync;
+  public:
+    present_guard(queue * q, swapchain * sc, frame_sync_stuff * sync)
+      : m_q { q }, m_swc { sc }, m_sync { sync }
+    {
+      sync->wait_and_reset_fence();
+      sc->acquire_next_image(sync->img_available_sema());
+    }
+    ~present_guard() {
+      m_swc->queue_present(m_q, m_sync->rnd_finished_sema());
+    }
+  };
 } // namespace voo

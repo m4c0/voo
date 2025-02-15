@@ -16,7 +16,7 @@ concept is_fn_taking_const_ref = requires(T t, const A &a) { t(a); };
 export class swapchain_and_stuff {
   vee::render_pass::type m_rp;
 
-  voo::frame_sync_stuff m_sync;
+  voo::frame_sync_stuff m_sync {};
   voo::swapchain m_swc;
 
   offscreen::depth_buffer m_depth;
