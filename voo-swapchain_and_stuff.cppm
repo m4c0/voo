@@ -3,6 +3,7 @@ import :guards;
 import :device_and_queue;
 import :offscreen;
 import :queue;
+import :single_cb;
 import hai;
 import vee;
 
@@ -21,8 +22,7 @@ export class swapchain_and_stuff {
   offscreen::depth_buffer m_depth;
 
   vee::swapchain m_swc;
-  vee::command_pool m_cp;
-  vee::command_buffer m_cb;
+  voo::single_cb m_cb;
 
   hai::array<vee::image_view> m_civs;
   hai::array<vee::framebuffer> m_fbs;
@@ -47,8 +47,7 @@ public:
       , m_ext { extent_of(pd, s) }
       , m_depth { pd, m_ext }
       , m_swc { vee::create_swapchain(pd, s) }
-      , m_cp { vee::create_command_pool(qf) }
-      , m_cb { vee::allocate_primary_command_buffer(*m_cp) } {
+      , m_cb { qf } {
     auto swc_imgs = vee::get_swapchain_images(*m_swc);
     m_civs = hai::array<vee::image_view>{swc_imgs.size()};
     m_fbs = hai::array<vee::framebuffer>{swc_imgs.size()};
@@ -74,7 +73,7 @@ public:
     }
   }
 
-  [[nodiscard]] constexpr const auto command_buffer() const { return m_cb; }
+  [[nodiscard]] constexpr const auto command_buffer() const { return m_cb.cb(); }
   [[nodiscard]] constexpr const auto extent() const { return m_ext; }
   [[nodiscard]] constexpr const auto framebuffer() const { return *m_fbs[m_idx]; }
 
@@ -100,7 +99,7 @@ public:
   void queue_submit(queue *q) {
     q->queue_submit({
         .fence = *m_f,
-        .command_buffer = m_cb,
+        .command_buffer = m_cb.cb(),
         .wait_semaphore = *m_img_available_sema,
         .signal_semaphore = *m_rnd_finished_sema,
     });
@@ -114,7 +113,7 @@ public:
   }
 
   void queue_one_time_submit(queue *q, auto &&fn) {
-    fn(voo::cmd_buf_one_time_submit{m_cb});
+    fn(voo::cmd_buf_one_time_submit{m_cb.cb()});
     queue_submit(q);
   }
 };

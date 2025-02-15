@@ -12,6 +12,7 @@ export import :offscreen;
 export import :one_quad;
 export import :one_quad_render;
 export import :shader;
+export import :single_cb;
 export import :single_dset;
 export import :sires_image;
 export import :swapchain_and_stuff;
