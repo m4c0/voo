@@ -41,20 +41,20 @@ public:
       , m_swc { pd, s }
       , m_depth { pd, m_swc.extent() }
       , m_cb { qf } {
-    for (auto i = 0; i < m_swc.count(); i++) {
+    m_swc.create_framebuffers([&](auto iv) {
       hai::array<vee::image_view::type> attachments { extras.size() + 2 };
       for (auto j = 0; j < extras.size(); j++) {
         attachments[j + 1] = extras[j];
       }
-      attachments[0] = m_swc.image_view(i);
+      attachments[0] = iv;
       attachments[extras.size() + 1] = m_depth.image_view();
-      m_swc.framebuffer(i, vee::create_framebuffer({
+      return vee::create_framebuffer({
           .physical_device = pd,
           .surface = s,
           .render_pass = m_rp,
           .attachments = traits::move(attachments),
-      }));
-    }
+      });
+    });
   }
 
   [[nodiscard]] constexpr const auto command_buffer() const { return m_cb.cb(); }

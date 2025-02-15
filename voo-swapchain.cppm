@@ -33,6 +33,11 @@ export namespace voo {
     void framebuffer(unsigned idx, vee::framebuffer f) {
       m_fbs[idx] = traits::move(f);
     }
+    void create_framebuffers(auto && fn) {
+      for (auto i = 0; i < count(); i++) {
+        m_fbs[i] = fn(*m_civs[i]);
+      }
+    }
 
     void acquire_next_image(vee::semaphore::type sema) {
       m_idx = vee::acquire_next_image(*m_swc, sema);
