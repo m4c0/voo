@@ -41,7 +41,7 @@ public:
       , m_swc { pd, s }
       , m_depth { pd, m_swc.extent() }
       , m_cb { qf } {
-    m_swc.create_framebuffers([&](auto iv) {
+    m_swc.create_framebuffers([&](auto i, auto iv) {
       hai::array<vee::image_view::type> attachments { extras.size() + 2 };
       for (auto j = 0; j < extras.size(); j++) {
         attachments[j + 1] = extras[j];

@@ -1,7 +1,10 @@
 export module voo:swapchain;
 import :device_and_queue;
 import hai;
+import traits;
 import vee;
+
+using traits::is_callable;
 
 export namespace voo {
   class swapchain {
@@ -37,9 +40,9 @@ export namespace voo {
     void framebuffer(unsigned idx, vee::framebuffer f) {
       m_fbs[idx] = traits::move(f);
     }
-    void create_framebuffers(auto && fn) {
+    void create_framebuffers(is_callable<unsigned, vee::image_view::type> auto && fn) {
       for (auto i = 0; i < count(); i++) {
-        m_fbs[i] = fn(*m_civs[i]);
+        m_fbs[i] = fn(i, *m_civs[i]);
       }
     }
 
