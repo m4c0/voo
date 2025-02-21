@@ -70,6 +70,13 @@ public:
     m_swc.acquire_next_image(m_sync.img_available_sema());
   }
 
+  auto render_pass_begin() const {
+    return vee::render_pass_begin {
+      .render_pass = m_rp,
+      .framebuffer = framebuffer(),
+      .extent = extent(),
+    };
+  }
   auto render_pass_begin(vee::render_pass_begin rpb) const {
     rpb.render_pass = m_rp;
     rpb.framebuffer = framebuffer();
