@@ -24,7 +24,6 @@ public:
     m_qf = qf;
 
     m_d = vee::create_single_queue_device(pd, qf);
-    m_rp = vee::create_render_pass(pd, nullptr);
     m_q = voo::queue{qf};
   }
   device_and_queue(const char *app_name, auto native_ptr) {
