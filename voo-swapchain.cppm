@@ -38,6 +38,10 @@ export namespace voo {
     [[nodiscard]] constexpr auto image_view(unsigned i) const { return *m_civs[i]; }
     [[nodiscard]] constexpr auto index() const { return m_idx; }
 
+    [[nodiscard]] constexpr auto aspect() const {
+      return static_cast<float>(extent().width) / static_cast<float>(extent().height);
+    }
+
     void framebuffer(unsigned idx, vee::framebuffer f) {
       m_fbs[idx] = traits::move(f);
     }
