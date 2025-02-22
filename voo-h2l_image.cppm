@@ -64,6 +64,10 @@ public:
     vee::cmd_fill_buffer(cb, m_hbuf.buffer(), 0);
   }
 
+  void debug_name(const char * name) {
+    vee::set_debug_utils_object_name(VK_OBJECT_TYPE_IMAGE, *m_img, name);
+  }
+
   [[nodiscard]] auto host_memory() const { return m_hbuf.memory(); }
   [[nodiscard]] auto iv() const { return *m_iv; }
   [[nodiscard]] constexpr auto width() const { return m_w; }
