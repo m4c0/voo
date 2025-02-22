@@ -21,7 +21,6 @@ export namespace voo::offscreen {
     [[nodiscard]] constexpr auto image() const { return *m_img; }
 
     void cmd_copy_to_host(vee::command_buffer cb, vee::offset ofs, vee::extent ext, vee::buffer::type host) {
-      vee::cmd_pipeline_barrier(cb, *m_img, vee::from_pipeline_to_host);
       vee::cmd_copy_image_to_buffer(cb, ofs, ext, *m_img, host);
     }
   };
@@ -69,11 +68,26 @@ export namespace voo::offscreen {
     vee::extent m_ext;
 
   public:
-    buffers(vee::physical_device pd, vee::extent ext, vee::format img, vee::image_layout ly)
+    buffers(vee::physical_device pd, vee::extent ext, vee::format img)
         : m_colour { pd, ext, img }
         , m_depth { pd, ext }
         , m_host { pd, ext }
-        , m_rp { vee::create_render_pass(img, ly) }
+        , m_rp { vee::create_render_pass({
+          .attachments {{
+            vee::create_colour_attachment(img, vee::image_layout_color_attachment_optimal),
+            vee::create_depth_attachment(),
+          }},
+          .subpasses {{
+            vee::create_subpass({
+              .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
+              .depth_stencil = create_attachment_ref(1, vee::image_layout_depth_stencil_attachment_optimal),
+            }),
+          }},
+          .dependencies {{
+            vee::create_colour_dependency(),
+            vee::create_depth_dependency(),
+          }},
+        }) }
         , m_fb { vee::create_framebuffer({
               .physical_device = pd,
               .render_pass = *m_rp,
@@ -89,6 +103,13 @@ export namespace voo::offscreen {
     [[nodiscard]] auto map_host() const { return m_host.map(); }
 
     void cmd_copy_to_host(vee::command_buffer cb) {
+      vee::cmd_pipeline_barrier(cb, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_HOST_BIT, {
+        .srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT,
+        .dstAccessMask = VK_ACCESS_HOST_READ_BIT,
+        .oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .newLayout = VK_IMAGE_LAYOUT_GENERAL,
+        .image = m_colour.image(),
+      });
       m_colour.cmd_copy_to_host(cb, {}, m_ext, m_host.buffer());
     }
 
