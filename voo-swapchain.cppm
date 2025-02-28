@@ -39,6 +39,21 @@ export namespace voo {
       return static_cast<float>(extent().width) / static_cast<float>(extent().height);
     }
 
+    [[nodiscard]] constexpr auto create_framebuffer(unsigned idx, const vee::render_pass::type rp) {
+      return vee::create_framebuffer({
+        .render_pass = rp,
+        .attachments {{ image_view(idx) }},
+        .extent = extent(),
+      });
+    }
+    [[nodiscard]] constexpr auto create_framebuffers(const vee::render_pass::type rp) {
+      hai::array<vee::framebuffer> res { count() };
+      for (auto i = 0; i < res.size(); i++) {
+        res[i] = create_framebuffer(i, rp);
+      }
+      return res;
+    }
+
     void acquire_next_image(vee::semaphore::type sema) {
       m_idx = vee::acquire_next_image(*m_swc, sema);
     }
