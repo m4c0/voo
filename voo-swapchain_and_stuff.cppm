@@ -18,6 +18,7 @@ export class swapchain_and_stuff {
 
   voo::frame_sync_stuff m_sync {};
   voo::swapchain m_swc;
+  hai::array<vee::framebuffer> m_fbs {};
 
   offscreen::depth_buffer m_depth;
 
@@ -41,25 +42,26 @@ public:
       , m_swc { pd, s }
       , m_depth { pd, m_swc.extent() }
       , m_cb { qf } {
-    m_swc.create_framebuffers([&](auto i, auto iv) {
+    m_fbs.set_capacity(m_swc.count());
+    for (auto i = 0; i < m_swc.count(); i++) {
       hai::array<vee::image_view::type> attachments { extras.size() + 2 };
       for (auto j = 0; j < extras.size(); j++) {
         attachments[j + 1] = extras[j];
       }
-      attachments[0] = iv;
+      attachments[0] = m_swc.image_view(i);
       attachments[extras.size() + 1] = m_depth.image_view();
-      return vee::create_framebuffer({
+      m_fbs[i] = vee::create_framebuffer({
           .physical_device = pd,
           .surface = s,
           .render_pass = m_rp,
           .attachments = traits::move(attachments),
       });
-    });
+    }
   }
 
   [[nodiscard]] constexpr const auto command_buffer() const { return m_cb.cb(); }
   [[nodiscard]] constexpr const auto extent() const { return m_swc.extent(); }
-  [[nodiscard]] constexpr const auto framebuffer() const { return m_swc.framebuffer(); }
+  [[nodiscard]] constexpr const auto framebuffer() const { return *m_fbs[m_swc.index()]; }
 
   [[nodiscard]] constexpr auto aspect() const {
     return static_cast<float>(extent().width) / static_cast<float>(extent().height);

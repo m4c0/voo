@@ -10,7 +10,6 @@ export namespace voo {
   class swapchain {
     vee::swapchain m_swc;
     hai::array<vee::image_view> m_civs;
-    hai::array<vee::framebuffer> m_fbs;
     vee::extent m_ext;
     unsigned m_idx;
 
@@ -25,7 +24,6 @@ export namespace voo {
     {
       auto swc_imgs = vee::get_swapchain_images(*m_swc);
       m_civs = hai::array<vee::image_view> { swc_imgs.size() };
-      m_fbs = hai::array<vee::framebuffer> { swc_imgs.size() };
 
       for (auto i = 0; i < swc_imgs.size(); i++) {
         m_civs[i] = vee::create_image_view_for_surface(swc_imgs[i], pd, s);
@@ -34,21 +32,11 @@ export namespace voo {
 
     [[nodiscard]] constexpr auto count() const { return m_civs.size(); }
     [[nodiscard]] constexpr auto extent() const { return m_ext; }
-    [[nodiscard]] constexpr auto framebuffer() const { return *m_fbs[m_idx]; }
     [[nodiscard]] constexpr auto image_view(unsigned i) const { return *m_civs[i]; }
     [[nodiscard]] constexpr auto index() const { return m_idx; }
 
     [[nodiscard]] constexpr auto aspect() const {
       return static_cast<float>(extent().width) / static_cast<float>(extent().height);
-    }
-
-    void framebuffer(unsigned idx, vee::framebuffer f) {
-      m_fbs[idx] = traits::move(f);
-    }
-    void create_framebuffers(is_callable<unsigned, vee::image_view::type> auto && fn) {
-      for (auto i = 0; i < count(); i++) {
-        m_fbs[i] = fn(i, *m_civs[i]);
-      }
     }
 
     void acquire_next_image(vee::semaphore::type sema) {
