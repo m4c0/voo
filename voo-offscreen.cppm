@@ -89,7 +89,6 @@ export namespace voo::offscreen {
           }},
         }) }
         , m_fb { vee::create_framebuffer({
-              .physical_device = pd,
               .render_pass = *m_rp,
               .attachments = { { m_colour.image_view(), m_depth.image_view() } },
               .extent = ext,

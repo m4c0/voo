@@ -51,10 +51,9 @@ public:
       attachments[0] = m_swc.image_view(i);
       attachments[extras.size() + 1] = m_depth.image_view();
       m_fbs[i] = vee::create_framebuffer({
-          .physical_device = pd,
-          .surface = s,
           .render_pass = m_rp,
           .attachments = traits::move(attachments),
+          .extent = m_swc.extent(),
       });
     }
   }
