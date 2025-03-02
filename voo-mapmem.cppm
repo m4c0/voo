@@ -23,4 +23,26 @@ public:
 
   [[nodiscard]] constexpr auto *operator*() { return m_ptr; }
 };
+
+  export template<typename T>
+  class memiter {
+    mapmem m_mm;
+    T * m_ptr;
+    unsigned * m_count;
+
+  public:
+    explicit memiter(vee::device_memory::type m, unsigned * c)
+      : m_mm { m }
+      , m_ptr { static_cast<T *>(*m_mm) }
+      , m_count { c }
+    {
+      *m_count = 0;
+    }
+
+    auto & operator+=(T i) {
+      *m_ptr++ = i;
+      ++*m_count;
+      return *this;
+    }
+  };
 } // namespace voo
