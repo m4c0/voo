@@ -44,5 +44,7 @@ public:
       ++*m_count;
       return *this;
     }
+
+    auto count() { return *m_count; }
   };
 } // namespace voo
