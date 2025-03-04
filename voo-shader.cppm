@@ -7,6 +7,8 @@ export class shader {
   vee::shader_module m_mod;
 
 public:
+  explicit shader(const void * data, unsigned size)
+      : m_mod{vee::create_shader_module(data, size)} {}
   explicit shader(jute::view res_name)
       : m_mod{vee::create_shader_module_from_resource(res_name)} {}
 
