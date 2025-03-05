@@ -45,6 +45,10 @@ public:
   [[nodiscard]] constexpr const auto render_pass() const { return *m_rp; }
   [[nodiscard]] constexpr const auto surface() const { return *m_s; }
   [[nodiscard]] constexpr auto *queue() { return &m_q; }
+
+  [[nodiscard]] auto find_best_surface_image_format() const {
+    return vee::find_best_surface_image_format(physical_device(), surface());
+  }
 };
 
 auto extent_of(vee::physical_device pd, vee::surface::type s) {
