@@ -39,6 +39,10 @@ public:
       *m_count = 0;
     }
 
+    auto & operator[](unsigned i) {
+      return m_ptr[i];
+    }
+
     auto & operator+=(T i) {
       *m_ptr++ = i;
       ++*m_count;
