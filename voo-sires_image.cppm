@@ -13,6 +13,27 @@ import traits;
 import vee;
 
 namespace voo {
+  export auto load_from_file(const char * file, vee::physical_device pd) {
+    return stbi::load(file)
+        .map([file, pd](auto &&img) {
+          unsigned w = img.width;
+          unsigned h = img.height;
+          auto m_img = h2l_image { pd, w, h, VK_FORMAT_R8G8B8A8_SRGB };
+
+          {
+            mapmem m{m_img.host_memory()};
+            auto *c = static_cast<unsigned char *>(*m);
+            for (auto i = 0; i < img.width * img.height * 4; i++) {
+              c[i] = (*img.data)[i];
+            }
+          }
+          silog::log(silog::info, "Loaded %dx%d image [%s]",
+              img.width, img.height, file);
+          return traits::move(m_img);
+        })
+        .trace("loading image")
+        .log_error();
+  }
 export auto load_sires_image(jute::view file, vee::physical_device pd) {
   return stbi::load_from_resource(file)
       .map([file, pd](auto &&img) {
