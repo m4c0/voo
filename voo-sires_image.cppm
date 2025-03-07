@@ -13,7 +13,7 @@ import traits;
 import vee;
 
 namespace voo {
-  export auto load_from_file(const char * file, vee::physical_device pd) {
+  export auto load_image_file(const char * file, vee::physical_device pd) {
     return stbi::load(file)
         .map([file, pd](auto &&img) {
           unsigned w = img.width;
