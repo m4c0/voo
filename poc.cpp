@@ -5,7 +5,6 @@
 import casein;
 import rng;
 import sith;
-import vee;
 import voo;
 
 struct inst {

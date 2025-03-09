@@ -23,7 +23,7 @@ export import :update_thread;
 export import :updater;
 import jute;
 import traits;
-import vee;
+export import vee;
 
 // TODO: move these back to their parts once clang on Windows accept it
 export namespace voo {
