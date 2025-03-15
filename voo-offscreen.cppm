@@ -112,7 +112,7 @@ export namespace voo::offscreen {
       m_colour.cmd_copy_to_host(cb, {}, m_ext, m_host.buffer());
     }
 
-    auto render_pass_begin(vee::render_pass_begin rpb) {
+    auto render_pass_begin(vee::render_pass_begin rpb) const {
       rpb.render_pass = render_pass();
       rpb.framebuffer = framebuffer();
       rpb.extent = extent();
