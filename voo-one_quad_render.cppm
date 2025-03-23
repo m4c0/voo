@@ -14,8 +14,8 @@ import vee;
 namespace voo {
   export class one_quad_render {
     using blends_t = decltype(vee::gr_pipeline_params::blends);
-    hai::cstr m_vert_name;
-    hai::cstr m_frag_name;
+    jute::heap m_vert_name;
+    jute::heap m_frag_name;
     blends_t m_blends;
     const vee::render_pass::type m_rp;
     const vee::pipeline_layout::type m_pl;
@@ -27,7 +27,7 @@ namespace voo {
     vee::gr_pipeline m_pipeline_old {};
 
     [[nodiscard]] auto current_mtime() {
-      return dotz::max(sires::stat(m_vert_name).unwrap(0), sires::stat(m_frag_name).unwrap(0));
+      return dotz::max(sires::stat(*m_vert_name).unwrap(0), sires::stat(*m_frag_name).unwrap(0));
     }
 
     [[nodiscard]] auto create_pipeline() {
@@ -37,8 +37,8 @@ namespace voo {
           .render_pass = m_rp,
           .blends = m_blends,
           .shaders {
-              voo::shader(m_vert_name).pipeline_vert_stage(),
-              voo::shader(m_frag_name).pipeline_frag_stage(),
+              voo::shader(*m_vert_name).pipeline_vert_stage(),
+              voo::shader(*m_frag_name).pipeline_frag_stage(),
           },
           .bindings { m_quad.vertex_input_bind() },
           .attributes { m_quad.vertex_attribute(0) },
@@ -49,15 +49,25 @@ namespace voo {
     one_quad_render(jute::view shader, const voo::device_and_queue * dq, const vee::pipeline_layout::type pl)
       : one_quad_render { shader, dq->physical_device(), dq->render_pass(), pl } {}
 
-    one_quad_render(jute::view shader, vee::physical_device pd, vee::render_pass::type rp, const vee::pipeline_layout::type pl,
-                    blends_t blends = { vee::colour_blend_classic() })
-        : m_vert_name { (shader + ".vert.spv").cstr() }
-        , m_frag_name { (shader + ".frag.spv").cstr() }
+    one_quad_render(
+        jute::view vert, jute::view frag,
+        vee::physical_device pd, vee::render_pass::type rp, const vee::pipeline_layout::type pl,
+        blends_t blends = { vee::colour_blend_classic() })
+        : m_vert_name { vert }
+        , m_frag_name { frag }
         , m_blends { blends }
         , m_rp { rp }
         , m_pl { pl }
         , m_quad { pd }
         , m_pipeline { create_pipeline() } {}
+
+    one_quad_render(jute::heap shader, vee::physical_device pd, vee::render_pass::type rp, const vee::pipeline_layout::type pl,
+                    blends_t blends = { vee::colour_blend_classic() })
+      : one_quad_render(*(shader + ".vert.spv"), *(shader + ".frag.spv"), pd, rp, pl, blends) {}
+
+    one_quad_render(jute::view shader, vee::physical_device pd, vee::render_pass::type rp, const vee::pipeline_layout::type pl,
+                    blends_t blends = { vee::colour_blend_classic() })
+      : one_quad_render(jute::heap { shader }, pd, rp, pl, blends) {}
 
     void run(vee::command_buffer cb, vee::extent ext, auto fn) {
       vee::cmd_set_viewport(cb, ext);
