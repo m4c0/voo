@@ -1,5 +1,6 @@
 export module voo:swapchain;
 import :device_and_queue;
+import :queue;
 import hai;
 import traits;
 import vee;
