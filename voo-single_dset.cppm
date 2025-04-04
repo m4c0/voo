@@ -17,4 +17,12 @@ namespace voo {
     [[nodiscard]] constexpr auto descriptor_set() const { return m_dset; }
     [[nodiscard]] constexpr auto descriptor_set_layout() const { return *m_dsl; }
   };
+  export class single_frag_dset : public single_dset {
+  public:
+    constexpr single_frag_dset() = default;
+    constexpr single_frag_dset(unsigned b_count) : single_dset {
+      vee::dsl_fragment_sampler(),
+      vee::combined_image_sampler(b_count),
+    } {};
+  };
 }
