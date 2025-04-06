@@ -36,7 +36,7 @@ public:
       , m_ptr { static_cast<T *>(*m_mm) }
       , m_count { c }
     {
-      *m_count = 0;
+      if (m_count) *m_count = 0;
     }
 
     auto & operator[](unsigned i) {
@@ -45,7 +45,7 @@ public:
 
     auto & operator+=(T i) {
       *m_ptr++ = i;
-      ++*m_count;
+      if (m_count) ++*m_count;
       return *this;
     }
 
