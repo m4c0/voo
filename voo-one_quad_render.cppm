@@ -49,15 +49,13 @@ namespace voo {
                     blends_t blends = { vee::colour_blend_classic() })
       : one_quad_render(jute::heap { shader }, pd, rp, pl, blends) {}
 
-    void run(vee::command_buffer cb, vee::extent ext, auto fn) {
-      vee::cmd_set_viewport(cb, ext);
-      vee::cmd_set_scissor(cb, ext);
+    void run(vee::command_buffer cb, auto fn) {
       vee::cmd_bind_gr_pipeline(cb, *m_pipeline);
       fn();
       m_quad.run(cb, 0, 1);
     }
-    void run(vee::command_buffer cb, vee::extent ext) {
-      run(cb, ext, [] {});
+    void run(vee::command_buffer cb) {
+      run(cb, [] {});
     }
   };
 
