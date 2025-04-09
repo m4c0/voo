@@ -31,6 +31,7 @@ public:
     unsigned * m_count;
 
   public:
+    explicit memiter(vee::device_memory::type m) : memiter { m, nullptr } {}
     explicit memiter(vee::device_memory::type m, unsigned * c)
       : m_mm { m }
       , m_ptr { static_cast<T *>(*m_mm) }
