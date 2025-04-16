@@ -20,7 +20,7 @@ namespace voo {
   export class single_frag_dset : public single_dset {
   public:
     constexpr single_frag_dset() = default;
-    constexpr single_frag_dset(unsigned b_count) : single_dset {
+    explicit single_frag_dset(unsigned b_count) : single_dset {
       vee::dsl_fragment_sampler(),
       vee::combined_image_sampler(b_count),
     } {};
