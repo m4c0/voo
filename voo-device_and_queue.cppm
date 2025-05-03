@@ -56,5 +56,9 @@ public:
   [[nodiscard]] auto extent_of() const {
     return voo::extent_of(physical_device(), surface());
   }
+  [[nodiscard]] auto aspect_of() const {
+    auto [w, h] = extent_of();
+    return static_cast<float>(w) / h;
+  }
 };
 } // namespace voo
