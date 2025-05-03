@@ -21,13 +21,13 @@ public:
   [[nodiscard]] auto pipeline_frag_stage(const char *fn = "main") {
     return vee::pipeline_frag_stage(*m_mod, fn);
   }
-  [[nodiscard]] auto pipeline_frag_stage(const char *fn, auto k) {
+  [[nodiscard]] auto pipeline_frag_stage(const char *fn, const auto & k) {
     return vee::pipeline_frag_stage(*m_mod, fn, k);
   }
   [[nodiscard]] auto pipeline_vert_stage(const char *fn = "main") {
     return vee::pipeline_vert_stage(*m_mod, fn);
   }
-  [[nodiscard]] auto pipeline_vert_stage(const char *fn, auto k) {
+  [[nodiscard]] auto pipeline_vert_stage(const char *fn, const auto & k) {
     return vee::pipeline_vert_stage(*m_mod, fn, k);
   }
 };
