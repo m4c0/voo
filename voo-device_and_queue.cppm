@@ -5,6 +5,10 @@ import no;
 import vee;
 
 export namespace voo {
+[[nodiscard]] auto extent_of(vee::physical_device pd, vee::surface::type s) {
+  return vee::get_surface_capabilities(pd, s).currentExtent;
+}
+
 class device_and_queue : no::no {
   vee::instance m_i;
   vee::debug_utils_messenger m_dbg;
@@ -49,12 +53,8 @@ public:
   [[nodiscard]] auto find_best_surface_image_format() const {
     return vee::find_best_surface_image_format(physical_device(), surface());
   }
+  [[nodiscard]] auto extent_of() const {
+    return voo::extent_of(physical_device(), surface());
+  }
 };
-
-auto extent_of(vee::physical_device pd, vee::surface::type s) {
-  return vee::get_surface_capabilities(pd, s).currentExtent;
-}
-auto extent_of(device_and_queue & dq) {
-  return extent_of(dq.physical_device(), dq.surface());
-}
 } // namespace voo
