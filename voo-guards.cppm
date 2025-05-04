@@ -3,6 +3,7 @@ import :frame_sync_stuff;
 import :queue;
 import :swapchain;
 import hai;
+import traits;
 import vee;
 
 namespace voo {
@@ -12,6 +13,9 @@ struct cb_deleter {
 struct rp_deleter {
   void operator()(vee::command_buffer cb) { vee::cmd_end_render_pass(cb); }
 };
+
+template<typename T>
+concept consumes_cmd_buf = traits::is_callable_r<T, void, vee::command_buffer>;
 
 export class cmd_buf_one_time_submit {
   hai::value_holder<vee::command_buffer, cb_deleter> m_cb;
@@ -23,7 +27,7 @@ public:
 
   [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
 
-  static void build(vee::command_buffer cb, auto &&fn) {
+  static void build(vee::command_buffer cb, consumes_cmd_buf auto &&fn) {
     cmd_buf_one_time_submit pcb{cb};
     fn(*pcb);
   }
@@ -39,7 +43,7 @@ public:
 
   [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
 
-  static void build(vee::command_buffer cb, auto &&fn) {
+  static void build(vee::command_buffer cb, consumes_cmd_buf auto &&fn) {
     cmd_buf_sim_use pcb{cb};
     fn(*pcb);
   }
@@ -56,7 +60,7 @@ public:
 
   [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
 
-  static void build(const vee::render_pass_begin &rbp, auto &&fn) {
+  static void build(const vee::render_pass_begin &rbp, consumes_cmd_buf auto &&fn) {
     cmd_render_pass pcb{rbp};
     fn(*pcb);
   }
@@ -75,7 +79,7 @@ public:
   [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
 
   static void build(vee::command_buffer cb, vee::render_pass::type rp,
-                    auto &&fn) {
+                    consumes_cmd_buf auto &&fn) {
     cmd_buf_render_pass_continue pcb{cb, rp};
     fn(*pcb);
   }
