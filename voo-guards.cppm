@@ -25,7 +25,7 @@ public:
 
   static void build(vee::command_buffer cb, auto &&fn) {
     cmd_buf_one_time_submit pcb{cb};
-    fn(pcb);
+    fn(*pcb);
   }
 };
 
@@ -41,7 +41,7 @@ public:
 
   static void build(vee::command_buffer cb, auto &&fn) {
     cmd_buf_sim_use pcb{cb};
-    fn(pcb);
+    fn(*pcb);
   }
 };
 
@@ -58,7 +58,7 @@ public:
 
   static void build(const vee::render_pass_begin &rbp, auto &&fn) {
     cmd_render_pass pcb{rbp};
-    fn(pcb);
+    fn(*pcb);
   }
 };
 
@@ -77,7 +77,7 @@ public:
   static void build(vee::command_buffer cb, vee::render_pass::type rp,
                     auto &&fn) {
     cmd_buf_render_pass_continue pcb{cb, rp};
-    fn(pcb);
+    fn(*pcb);
   }
 };
 
