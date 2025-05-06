@@ -27,6 +27,12 @@ namespace voo {
 
     [[nodiscard]] auto buffer() const { return m_hbuf.buffer(); }
     [[nodiscard]] auto memory() const { return m_hbuf.memory(); }
+
+    void setup_copy(vee::command_buffer cb, vee::image::type img) const {
+      vee::cmd_pipeline_barrier(cb, img, vee::from_host_to_transfer);
+      vee::cmd_copy_buffer_to_image(cb, extent(), buffer(), img);
+      vee::cmd_pipeline_barrier(cb, img, vee::from_transfer_to_fragment);
+    }
   };
 
 export class h2l_image {
@@ -68,11 +74,7 @@ public:
   explicit h2l_image(vee::physical_device pd, unsigned w, unsigned h, vee::format fmt)
     : h2l_image {{ pd, w, h, fmt }} {}
 
-  void setup_copy(vee::command_buffer cb) const {
-    vee::cmd_pipeline_barrier(cb, *m_img, vee::from_host_to_transfer);
-    vee::cmd_copy_buffer_to_image(cb, m_hbuf.extent(), m_hbuf.buffer(), *m_img);
-    vee::cmd_pipeline_barrier(cb, *m_img, vee::from_transfer_to_fragment);
-  }
+  void setup_copy(vee::command_buffer cb) const { m_hbuf.setup_copy(cb, *m_img); }
   void clear_host(vee::command_buffer cb) const {
     vee::cmd_pipeline_barrier(cb, m_hbuf.buffer(), vee::from_pipeline_to_host);
     vee::cmd_fill_buffer(cb, m_hbuf.buffer(), 0);
