@@ -13,6 +13,14 @@ import traits;
 import vee;
 
 namespace voo {
+  export auto load_image_file_as_buffer(const char * file, vee::physical_device pd) {
+    return stbi::load(file).map([file, pd](auto && img) {
+      auto res = host_buffer_for_image(pd, img.width, img.height, 4);
+      silog::log(silog::info, "Pre-loaded %dx%d image [%s]", img.width, img.height, file);
+      return res;
+    });
+  }
+
   export auto load_image_file(const char * file, vee::physical_device pd) {
     return stbi::load(file)
         .map([file, pd](auto &&img) {
