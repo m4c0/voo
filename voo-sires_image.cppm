@@ -18,7 +18,9 @@ namespace voo {
       auto res = host_buffer_for_image(pd, img.width, img.height, 4);
       silog::log(silog::info, "Pre-loaded %dx%d image [%s]", img.width, img.height, file);
       return res;
-    });
+    })
+    .trace("pre-loading image")
+    .log_error();
   }
 
   export auto load_image_file(const char * file, vee::physical_device pd) {
