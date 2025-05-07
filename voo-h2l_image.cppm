@@ -85,6 +85,7 @@ public:
   }
 
   [[nodiscard]] auto host_memory() const { return m_hbuf.memory(); }
+  [[nodiscard]] auto image() const { return *m_img; }
   [[nodiscard]] auto iv() const { return *m_iv; }
   [[nodiscard]] constexpr auto width() const { return m_hbuf.width(); }
   [[nodiscard]] constexpr auto height() const { return m_hbuf.height(); }
