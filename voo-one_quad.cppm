@@ -43,10 +43,10 @@ public:
     run(*scb, idx, inst, first_inst);
   }
 
-  auto vertex_input_bind() const {
+  static auto vertex_input_bind() {
     return vee::vertex_input_bind(sizeof(float) * quad::v_size);
   }
-  auto vertex_attribute(unsigned binding) const {
+  static auto vertex_attribute(unsigned binding) {
     return vee::vertex_attribute_vec2(binding, 0);
   }
 };
