@@ -17,6 +17,8 @@ struct quad {
 } // namespace
 
 namespace voo {
+  // TODO: make this "singleton-able"
+  // TODO: make a "local" variant
 export class one_quad {
   vee::buffer m_qbuf;
   vee::device_memory m_qmem;
