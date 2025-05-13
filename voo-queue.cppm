@@ -33,5 +33,10 @@ public:
     si.queue = m_q;
     vee::queue_submit(si);
   }
+
+  static auto & instance() {
+    static queue * i {};
+    return i;
+  }
 };
 }

@@ -29,6 +29,7 @@ public:
 
     m_d = vee::create_single_queue_device(pd, qf);
     m_q = voo::queue{qf};
+    voo::queue::instance() = &m_q;
   }
   device_and_queue(const char *app_name, auto native_ptr, bool debug = true) {
     m_i = vee::create_instance(app_name);
@@ -41,6 +42,7 @@ public:
     m_d = vee::create_single_queue_device(pd, qf);
     m_rp = vee::create_render_pass(pd, *m_s);
     m_q = voo::queue{qf};
+    voo::queue::instance ()= &m_q;
   }
   ~device_and_queue() { vee::device_wait_idle(); }
 
