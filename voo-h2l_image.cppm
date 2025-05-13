@@ -6,8 +6,7 @@ import sith;
 import vee;
 
 namespace voo {
-  export class host_buffer_for_image {
-    host_buffer m_hbuf;
+  export class host_buffer_for_image : public host_buffer {
     unsigned m_w;
     unsigned m_h;
 
@@ -15,7 +14,7 @@ namespace voo {
     constexpr host_buffer_for_image() = default;
 
     host_buffer_for_image(vee::physical_device pd, unsigned w, unsigned h, unsigned sz, auto ... usages)
-      : m_hbuf { pd, vee::create_buffer(w * h * sz, vee::buffer_usage::transfer_src_buffer, usages...) }
+      : host_buffer { pd, w * h * sz, vee::buffer_usage::transfer_src_buffer, usages... }
       , m_w { w }
       , m_h { h }
     {}
@@ -24,9 +23,6 @@ namespace voo {
     [[nodiscard]] constexpr auto height() const { return m_h; }
 
     [[nodiscard]] constexpr auto extent() const { return vee::extent { m_w, m_h }; }
-
-    [[nodiscard]] auto buffer() const { return m_hbuf.buffer(); }
-    [[nodiscard]] auto memory() const { return m_hbuf.memory(); }
 
     void setup_copy(vee::command_buffer cb, vee::image::type img) const {
       vee::cmd_pipeline_barrier(cb, img, vee::from_host_to_transfer);
