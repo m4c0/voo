@@ -8,11 +8,19 @@ int main() {
   auto q = dq.queue();
 
   auto cpool = q->create_command_pool();
-  auto cb = cpool.allocate_primary_command_buffer();
 
-  voo::cmd_buf_one_time_submit::build(cb, [](auto cb) {});
+  vee::command_buffer cb = cpool.allocate_primary_command_buffer();
+  voo::fence f {{}};
 
-  q->queue_submit({ .command_buffer = cb });
+  for (auto i = 0; i < 5; i++) {
+    f.wait_and_reset();
+
+    voo::cmd_buf_one_time_submit::build(cb, [](auto cb) {});
+    q->queue_submit({
+      .fence = f,
+      .command_buffer = cb,
+    });
+  }
 
   vee::device_wait_idle();
 }

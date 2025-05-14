@@ -30,7 +30,7 @@ protected:
     build_cmd_buf(m_cb);
 
     m_q->queue_submit({
-        .fence = *m_f,
+        .fence = m_f,
         .command_buffer = m_cb,
     });
   }
