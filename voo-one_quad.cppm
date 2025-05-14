@@ -26,7 +26,7 @@ export class one_quad {
 public:
   explicit one_quad(vee::physical_device pd) {
     m_qbuf = vee::create_vertex_buffer(sizeof(quad));
-    m_qmem = vee::create_host_buffer_memory(pd, sizeof(quad));
+    m_qmem = vee::create_host_memory(pd, sizeof(quad));
     vee::bind_buffer_memory(*m_qbuf, *m_qmem, 0);
 
     mapmem mem{*m_qmem};
