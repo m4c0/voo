@@ -15,7 +15,7 @@ namespace voo {
 
     bound_buffer(unsigned mem_type_idx, unsigned sz, vee::buffer_usage usage, auto... usages)
       : m_buf { vee::create_buffer(sz, usage, usages...) }
-      , m_mem { vee::create_memory(mem_type_idx, sz) }
+      , m_mem { vee::create_memory({ .allocationSize = sz, .memoryTypeIndex = mem_type_idx }) }
     { vee::bind_buffer_memory(*m_buf, *m_mem); }
     
     [[nodiscard]] auto buffer() const { return *m_buf; }
