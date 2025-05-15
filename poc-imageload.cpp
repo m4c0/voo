@@ -11,7 +11,7 @@ int main() {
 
   struct bits {
     vee::command_buffer cb;
-    voo::fence f { voo::fence::signaled {} };
+    voo::fence f { true };
     voo::queue * q;
   } data {
     .cb = cpool.allocate_primary_command_buffer(),

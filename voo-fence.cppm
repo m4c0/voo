@@ -6,10 +6,11 @@ export class fence {
   vee::fence m_f{};
 
 public:
-  struct signaled {};
-
   fence() = default;
-  fence(signaled s) : m_f{vee::create_fence_signaled()} {}
+
+  explicit fence(bool signaled)
+    : m_f { signaled ? vee::create_fence_signaled() : vee::create_fence_reset() }
+  {}
 
   bool get() { return vee::get_fence_status(*m_f); }
   void wait_and_reset(unsigned timeout_ms = ~0U) {

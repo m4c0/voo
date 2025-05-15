@@ -13,7 +13,7 @@ export class update_thread : public sith::thread {
   vee::command_pool m_cp;
   vee::command_buffer m_cb;
 
-  voo::fence m_f{voo::fence::signaled{}};
+  voo::fence m_f { true };
 
 protected:
   constexpr update_thread() = default;
