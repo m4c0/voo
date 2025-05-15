@@ -7,27 +7,29 @@ import voo;
 int main() {
   voo::device_and_queue dq { "poc-imageload" };
 
-  auto cpool = dq.queue()->create_command_pool();
+  stbi::load("poc-imageload.png", nullptr, [&](auto ptr, auto & img) {
+    unsigned sz = img.width * img.height * 4;
+    voo::host_buffer host { dq.physical_device(), sz };
+    {
+      voo::memiter<unsigned char> c { host.memory() };
+      for (auto i = 0; i < sz; i++) c[i] = (*img.data)[i];
+    }
 
-  struct bits {
-    vee::command_buffer cb;
-    voo::fence f { true };
-    voo::queue * q;
-  } data {
-    .cb = cpool.allocate_primary_command_buffer(),
-    .q  = dq.queue(),
-  };
-  stbi::load_from_resource("poc-imageload.png", &data, [](auto ptr, auto & img) {
-    bits * b = static_cast<bits *>(ptr);
+    voo::fence f { false };
+    auto cpool = dq.queue()->create_command_pool();
+    auto cb = cpool.allocate_primary_command_buffer();
 
-    b->f.wait_and_reset();
-
-    voo::cmd_buf_one_time_submit::build(b->cb, [](auto cb) {
+    voo::cmd_buf_one_time_submit::build(cb, [&](auto cb) {
+      // vee::cmd_pipeline_barrier(cb, img, vee::from_host_to_transfer);
+      // vee::cmd_copy_buffer_to_image(cb, extent(), buffer(), img);
+      // vee::cmd_pipeline_barrier(cb, img, vee::from_transfer_to_fragment);
     });
-    b->q->queue_submit({
-      .fence = b->f,
-      .command_buffer = b->cb,
+    dq.queue()->queue_submit({
+      .fence = f,
+      .command_buffer = cb,
     });
+
+    f.wait();
   });
 
   vee::device_wait_idle();
