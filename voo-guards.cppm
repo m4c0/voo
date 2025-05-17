@@ -2,7 +2,7 @@ export module voo:guards;
 import :frame_sync_stuff;
 import :queue;
 import :swapchain;
-import hai;
+import hay;
 import traits;
 import vee;
 
@@ -18,14 +18,14 @@ template<typename T>
 concept consumes_cmd_buf = traits::is_callable_r<T, void, vee::command_buffer>;
 
 export class cmd_buf_one_time_submit {
-  hai::value_holder<vee::command_buffer, cb_deleter> m_cb;
+  hay<vee::command_buffer, nullptr, vee::end_cmd_buf> m_cb;
 
 public:
   explicit cmd_buf_one_time_submit(vee::command_buffer cb) : m_cb{cb} {
     vee::begin_cmd_buf_one_time_submit(cb);
   }
 
-  [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
+  [[nodiscard]] constexpr vee::command_buffer operator*() const { return m_cb; }
 
   static void build(vee::command_buffer cb, consumes_cmd_buf auto &&fn) {
     cmd_buf_one_time_submit pcb{cb};
@@ -34,14 +34,14 @@ public:
 };
 
 export class cmd_buf_sim_use {
-  hai::value_holder<vee::command_buffer, cb_deleter> m_cb;
+  hay<vee::command_buffer, nullptr, vee::end_cmd_buf> m_cb;
 
 public:
   explicit cmd_buf_sim_use(vee::command_buffer cb) : m_cb{cb} {
     vee::begin_cmd_buf_sim_use(cb);
   }
 
-  [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
+  [[nodiscard]] constexpr vee::command_buffer operator*() const { return m_cb; }
 
   static void build(vee::command_buffer cb, consumes_cmd_buf auto &&fn) {
     cmd_buf_sim_use pcb{cb};
@@ -50,7 +50,7 @@ public:
 };
 
 export class cmd_render_pass {
-  hai::value_holder<vee::command_buffer, rp_deleter> m_cb;
+  hay<vee::command_buffer, nullptr, vee::cmd_end_render_pass> m_cb;
 
 public:
   explicit cmd_render_pass(const vee::render_pass_begin &rpb)
@@ -58,7 +58,7 @@ public:
     vee::cmd_begin_render_pass(rpb);
   }
 
-  [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
+  [[nodiscard]] constexpr vee::command_buffer operator*() const { return m_cb; }
 
   static void build(const vee::render_pass_begin &rbp, consumes_cmd_buf auto &&fn) {
     cmd_render_pass pcb{rbp};
@@ -67,7 +67,7 @@ public:
 };
 
 export class cmd_buf_render_pass_continue {
-  hai::value_holder<vee::command_buffer, cb_deleter> m_cb;
+  hay<vee::command_buffer, nullptr, vee::end_cmd_buf> m_cb;
 
 public:
   explicit cmd_buf_render_pass_continue(vee::command_buffer cb,
@@ -76,7 +76,7 @@ public:
     vee::begin_cmd_buf_render_pass_continue(cb, rp);
   }
 
-  [[nodiscard]] constexpr auto operator*() const { return *m_cb; }
+  [[nodiscard]] constexpr vee::command_buffer operator*() const { return m_cb; }
 
   static void build(vee::command_buffer cb, vee::render_pass::type rp,
                     consumes_cmd_buf auto &&fn) {
