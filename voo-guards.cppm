@@ -7,18 +7,13 @@ import traits;
 import vee;
 
 namespace voo {
-struct cb_deleter {
-  void operator()(vee::command_buffer cb) { vee::end_cmd_buf(cb); }
-};
-struct rp_deleter {
-  void operator()(vee::command_buffer cb) { vee::cmd_end_render_pass(cb); }
-};
+  template<typename T>
+  concept consumes_cmd_buf = traits::is_callable_r<T, void, vee::command_buffer>;
 
-template<typename T>
-concept consumes_cmd_buf = traits::is_callable_r<T, void, vee::command_buffer>;
+  export using command_buffer = hay<vee::command_buffer, nullptr, vee::end_cmd_buf>;
 
 export class cmd_buf_one_time_submit {
-  hay<vee::command_buffer, nullptr, vee::end_cmd_buf> m_cb;
+  command_buffer m_cb;
 
 public:
   explicit cmd_buf_one_time_submit(vee::command_buffer cb) : m_cb{cb} {
@@ -34,7 +29,7 @@ public:
 };
 
 export class cmd_buf_sim_use {
-  hay<vee::command_buffer, nullptr, vee::end_cmd_buf> m_cb;
+  command_buffer m_cb;
 
 public:
   explicit cmd_buf_sim_use(vee::command_buffer cb) : m_cb{cb} {
@@ -67,7 +62,7 @@ public:
 };
 
 export class cmd_buf_render_pass_continue {
-  hay<vee::command_buffer, nullptr, vee::end_cmd_buf> m_cb;
+  command_buffer m_cb;
 
 public:
   explicit cmd_buf_render_pass_continue(vee::command_buffer cb,
