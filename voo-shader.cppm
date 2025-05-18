@@ -1,5 +1,6 @@
 export module voo:shader;
 import jute;
+import sires;
 import vee;
 
 namespace voo {
@@ -8,9 +9,9 @@ export class shader {
 
   static auto create_shader(jute::view from) {
     if (from.subview(4).before == "\x03\x02\x23\x07") {
-      return vee::create_shader_module(from.begin(), from.size());
+      return vee::create_shader_module(from);
     } else {
-      return vee::create_shader_module_from_resource(from);
+      return vee::create_shader_module(sires::jojo_cstr(from));
     }
   }
 
