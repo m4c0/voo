@@ -1,4 +1,5 @@
 export module voo;
+export import :bound_buffer;
 export import :command_pool;
 export import :device_and_queue;
 export import :fence;

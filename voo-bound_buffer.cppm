@@ -21,4 +21,10 @@ namespace voo {
     [[nodiscard]] auto buffer() const { return *m_buf; }
     [[nodiscard]] auto memory() const { return *m_mem; }
   };
+
+  export struct bound_image {
+    vee::image img;
+    vee::device_memory mem;
+    vee::image_view iv;
+  };
 }

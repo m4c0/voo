@@ -6,13 +6,7 @@ import silog;
 import stubby;
 import voo;
 
-struct bound_image {
-  vee::image img;
-  vee::device_memory mem;
-  vee::image_view iv;
-};
-
-void load_image(jute::view name, vee::physical_device pd, voo::queue * q, bound_image & bi, auto && callback) {
+void load_image(jute::view name, vee::physical_device pd, voo::queue * q, voo::bound_image & bi, auto && callback) {
   stbi::load(name, nullptr, [&](auto ptr, auto & img) {
     unsigned w = img.width;
     unsigned h = img.height;
@@ -52,7 +46,7 @@ void load_image(jute::view name, vee::physical_device pd, voo::queue * q, bound_
 int main() {
   voo::device_and_queue dq { "poc-imageload" };
 
-  bound_image img {};
+  voo::bound_image img {};
   load_image("poc-imageload.png", dq.physical_device(), dq.queue(), img, [] {
     silog::log(silog::info, "Image loaded");
   });
