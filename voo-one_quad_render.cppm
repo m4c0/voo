@@ -2,13 +2,8 @@ export module voo:one_quad_render;
 import :device_and_queue;
 import :one_quad;
 import :shader;
-import dotz;
-import hai;
 import jute;
 import silog;
-import sires;
-import sitime;
-import traits;
 import vee;
 
 namespace voo {
