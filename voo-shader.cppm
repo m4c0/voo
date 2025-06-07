@@ -16,6 +16,7 @@ export class shader {
   }
 
 public:
+  constexpr shader() = default;
   explicit shader(const void * data, unsigned size) : m_mod{vee::create_shader_module(data, size)} {}
   explicit shader(jute::view src_or_res) : m_mod { create_shader(src_or_res) } {}
 
