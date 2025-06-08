@@ -14,5 +14,6 @@ int main() {
     silog::log(silog::info, "Image loaded");
   });
 
+  silog::log(silog::info, "Waiting for idle device");
   vee::device_wait_idle();
 }
