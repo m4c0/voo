@@ -76,8 +76,8 @@ export constexpr auto load_sires_image(jute::view file) {
   return [=](vee::physical_device pd) { return load_sires_image(file, pd); };
 }
 
-  export void load_image(jute::view name, vee::physical_device pd, queue * q, voo::bound_image & bi, auto && callback) {
-    stbi::load(name, nullptr, [&](auto ptr, auto & img) {
+  export void load_image(jute::view name, vee::physical_device pd, queue * q, voo::bound_image * bi, hai::fn<void> callback) {
+    stbi::load(name, nullptr, [bi, pd, q, fn = traits::move(callback)](auto ptr, auto & img) mutable {
       unsigned w = img.width;
       unsigned h = img.height;
       unsigned sz = w * h * 4;
@@ -89,19 +89,19 @@ export constexpr auto load_sires_image(jute::view file) {
   
       constexpr const auto fmt = VK_FORMAT_R8G8B8A8_SRGB;
       vee::extent ext { w, h };
-      bi.img = vee::create_image(ext, fmt);
-      bi.mem = vee::create_local_image_memory(pd, *bi.img);
-      vee::bind_image_memory(*bi.img, *bi.mem);
-      bi.iv = vee::create_image_view(*bi.img, fmt);
+      bi->img = vee::create_image(ext, fmt);
+      bi->mem = vee::create_local_image_memory(pd, *bi->img);
+      vee::bind_image_memory(*bi->img, *bi->mem);
+      bi->iv = vee::create_image_view(*bi->img, fmt);
   
       fence f { false };
       auto cpool = q->create_command_pool();
       auto cb = cpool.allocate_primary_command_buffer();
   
       cmd_buf_one_time_submit::build(cb, [&](auto cb) {
-        vee::cmd_pipeline_barrier(cb, *bi.img, vee::from_host_to_transfer);
-        vee::cmd_copy_buffer_to_image(cb, ext, host.buffer(), *bi.img);
-        vee::cmd_pipeline_barrier(cb, *bi.img, vee::from_transfer_to_fragment);
+        vee::cmd_pipeline_barrier(cb, *bi->img, vee::from_host_to_transfer);
+        vee::cmd_copy_buffer_to_image(cb, ext, host.buffer(), *bi->img);
+        vee::cmd_pipeline_barrier(cb, *bi->img, vee::from_transfer_to_fragment);
       });
       q->queue_submit({
         .fence = f,
@@ -109,7 +109,7 @@ export constexpr auto load_sires_image(jute::view file) {
       });
   
       f.wait();
-      callback();
+      fn();
     });
   }
 } // namespace voo
