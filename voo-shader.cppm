@@ -20,6 +20,8 @@ public:
   explicit shader(const void * data, unsigned size) : m_mod{vee::create_shader_module(data, size)} {}
   explicit shader(jute::view src_or_res) : m_mod { create_shader(src_or_res) } {}
 
+  explicit constexpr operator bool() const { return *m_mod; }
+
   [[nodiscard]] auto pipeline_frag_stage(const char *fn = "main") {
     return vee::pipeline_frag_stage(*m_mod, fn);
   }
