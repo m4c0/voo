@@ -1,13 +1,13 @@
 export module voo:h2l_yuv_image;
+import :buffers;
 import :device_and_queue;
-import :host_buffer;
 import vee;
 
 namespace voo {
 export class h2l_yuv_image {
-  host_buffer m_buf_y;
-  host_buffer m_buf_u;
-  host_buffer m_buf_v;
+  bound_buffer m_buf_y;
+  bound_buffer m_buf_u;
+  bound_buffer m_buf_v;
 
   vee::sampler_ycbcr_conversion m_smp_conv;
 
@@ -21,9 +21,9 @@ export class h2l_yuv_image {
 public:
   h2l_yuv_image() = default;
   explicit h2l_yuv_image(vee::physical_device pd, unsigned w, unsigned h)
-      : m_buf_y{pd, w * h}
-      , m_buf_u{pd, w * h / 4}
-      , m_buf_v{pd, w * h / 4}
+      : m_buf_y{bound_buffer::create_from_host(pd, w * h)}
+      , m_buf_u{bound_buffer::create_from_host(pd, w * h / 4)}
+      , m_buf_v{bound_buffer::create_from_host(pd, w * h / 4)}
       , m_smp_conv{vee::create_sampler_yuv420p_conversion(pd)}
       , m_w{w}
       , m_h{h} {
@@ -38,15 +38,15 @@ public:
 
   void setup_copy(vee::command_buffer cb) const {
     vee::cmd_pipeline_barrier(cb, *m_img, vee::from_host_to_transfer);
-    vee::cmd_copy_yuv420p_buffers_to_image(cb, {m_w, m_h}, m_buf_y.buffer(),
-                                           m_buf_u.buffer(), m_buf_v.buffer(),
+    vee::cmd_copy_yuv420p_buffers_to_image(cb, {m_w, m_h}, *m_buf_y.buffer,
+                                           *m_buf_u.buffer, *m_buf_v.buffer,
                                            *m_img);
     vee::cmd_pipeline_barrier(cb, *m_img, vee::from_transfer_to_fragment);
   }
 
-  [[nodiscard]] auto host_memory_y() const { return m_buf_y.memory(); }
-  [[nodiscard]] auto host_memory_u() const { return m_buf_u.memory(); }
-  [[nodiscard]] auto host_memory_v() const { return m_buf_v.memory(); }
+  [[nodiscard]] auto host_memory_y() const { return *m_buf_y.memory; }
+  [[nodiscard]] auto host_memory_u() const { return *m_buf_u.memory; }
+  [[nodiscard]] auto host_memory_v() const { return *m_buf_v.memory; }
 
   [[nodiscard]] auto iv() const { return *m_iv; }
   [[nodiscard]] auto conv() const { return *m_smp_conv; }

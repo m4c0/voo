@@ -1,12 +1,12 @@
 export module voo:h2l_image;
+import :buffers;
 import :device_and_queue;
 import :guards;
-import :host_buffer;
 import sith;
 import vee;
 
 namespace voo {
-  export class host_buffer_for_image : public host_buffer {
+  export class host_buffer_for_image : public bound_buffer {
     unsigned m_w;
     unsigned m_h;
 
@@ -14,7 +14,7 @@ namespace voo {
     constexpr host_buffer_for_image() = default;
 
     host_buffer_for_image(vee::physical_device pd, unsigned w, unsigned h, unsigned sz, auto ... usages)
-      : host_buffer { pd, w * h * sz, vee::buffer_usage::transfer_src_buffer, usages... }
+      : bound_buffer { bound_buffer::create_from_host(pd, w * h * sz, vee::buffer_usage::transfer_src_buffer, usages...) }
       , m_w { w }
       , m_h { h }
     {}
@@ -26,7 +26,7 @@ namespace voo {
 
     void setup_copy(vee::command_buffer cb, vee::image::type img) const {
       vee::cmd_pipeline_barrier(cb, img, vee::from_host_to_transfer);
-      vee::cmd_copy_buffer_to_image(cb, extent(), buffer(), img);
+      vee::cmd_copy_buffer_to_image(cb, extent(), *buffer, img);
       vee::cmd_pipeline_barrier(cb, img, vee::from_transfer_to_fragment);
     }
   };
@@ -72,15 +72,15 @@ public:
 
   void setup_copy(vee::command_buffer cb) const { m_hbuf.setup_copy(cb, *m_img); }
   void clear_host(vee::command_buffer cb) const {
-    vee::cmd_pipeline_barrier(cb, m_hbuf.buffer(), vee::from_pipeline_to_host);
-    vee::cmd_fill_buffer(cb, m_hbuf.buffer(), 0);
+    vee::cmd_pipeline_barrier(cb, *m_hbuf.buffer, vee::from_pipeline_to_host);
+    vee::cmd_fill_buffer(cb, *m_hbuf.buffer, 0);
   }
 
   void debug_name(const char * name) {
     vee::set_debug_utils_object_name(VK_OBJECT_TYPE_IMAGE, *m_img, name);
   }
 
-  [[nodiscard]] auto host_memory() const { return m_hbuf.memory(); }
+  [[nodiscard]] auto host_memory() const { return *m_hbuf.memory; }
   [[nodiscard]] auto image() const { return *m_img; }
   [[nodiscard]] auto iv() const { return *m_iv; }
   [[nodiscard]] constexpr auto width() const { return m_hbuf.width(); }

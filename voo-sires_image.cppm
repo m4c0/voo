@@ -1,4 +1,5 @@
 export module voo:sires_image;
+import :bound_buffer;
 import :device_and_queue;
 import :guards;
 import :h2l_image;
@@ -17,7 +18,7 @@ namespace voo {
     return stbi::load(file).map([file, pd](auto && img) {
       auto res = host_buffer_for_image(pd, img.width, img.height, 4);
       {
-        mapmem m { res.memory() };
+        mapmem m { *res.memory };
         auto *c = static_cast<unsigned char *>(*m);
         for (auto i = 0; i < img.width * img.height * 4; i++) {
           c[i] = (*img.data)[i];
@@ -81,9 +82,9 @@ export constexpr auto load_sires_image(jute::view file) {
       unsigned w = img.width;
       unsigned h = img.height;
       unsigned sz = w * h * 4;
-      host_buffer host { pd, sz };
+      auto host = bound_buffer::create_from_host(pd, sz);
       {
-        memiter<unsigned char> c { host.memory() };
+        memiter<unsigned char> c { *host.memory };
         for (auto i = 0; i < sz; i++) c[i] = (*img.data)[i];
       }
   
@@ -100,7 +101,7 @@ export constexpr auto load_sires_image(jute::view file) {
   
       cmd_buf_one_time_submit::build(cb, [&](auto cb) {
         vee::cmd_pipeline_barrier(cb, *bi->img, vee::from_host_to_transfer);
-        vee::cmd_copy_buffer_to_image(cb, ext, host.buffer(), *bi->img);
+        vee::cmd_copy_buffer_to_image(cb, ext, *host.buffer, *bi->img);
         vee::cmd_pipeline_barrier(cb, *bi->img, vee::from_transfer_to_fragment);
       });
       q->queue_submit({
