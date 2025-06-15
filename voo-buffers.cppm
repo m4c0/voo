@@ -2,7 +2,7 @@ export module voo:buffers;
 import vee;
 
 namespace voo {
-  struct bound_buffer {
+  export struct bound_buffer {
     vee::buffer buffer;
     vee::device_memory memory;
 
