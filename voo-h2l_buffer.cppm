@@ -16,7 +16,7 @@ public:
     vee::buffer_usage usage = vee::buffer_usage::vertex_buffer
   )
     : m_hbuf { bound_buffer::create_from_host(pd, sz) }
-    , m_lbuf { bound_buffer::create_from_device_local(pd, sz) }
+    , m_lbuf { bound_buffer::create_from_device_local(pd, sz, vee::buffer_usage::transfer_dst_buffer, usage) }
     , m_sz { sz } {}
 
   explicit h2l_buffer(const voo::device_and_queue &dq, unsigned sz)
