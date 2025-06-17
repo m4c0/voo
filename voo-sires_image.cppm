@@ -1,8 +1,8 @@
 export module voo:sires_image;
-import :bound_buffer;
 import :device_and_queue;
 import :guards;
 import :h2l_image;
+import :images;
 import :mapmem;
 import :updater;
 import :queue;

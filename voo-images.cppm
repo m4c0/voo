@@ -1,4 +1,4 @@
-export module voo:bound_buffer;
+export module voo:images;
 import vee;
 
 namespace voo {

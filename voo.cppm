@@ -1,6 +1,5 @@
 export module voo;
 export import :buffers;
-export import :bound_buffer;
 export import :command_pool;
 export import :device_and_queue;
 export import :fence;
@@ -9,6 +8,7 @@ export import :guards;
 export import :h2l_buffer;
 export import :h2l_image;
 export import :h2l_yuv_image;
+export import :images;
 export import :mapmem;
 export import :offscreen;
 export import :one_quad;
