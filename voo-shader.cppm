@@ -1,5 +1,6 @@
 export module voo:shader;
 import jute;
+import silog;
 import sires;
 import vee;
 
@@ -11,6 +12,7 @@ export class shader {
     if (from.subview(4).before == "\x03\x02\x23\x07") {
       return vee::create_shader_module(from);
     } else {
+      silog::log(silog::info, "Loading shader %s", from.cstr().begin());
       return vee::create_shader_module(sires::jojo_cstr(from));
     }
   }
