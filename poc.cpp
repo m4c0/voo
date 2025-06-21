@@ -66,6 +66,8 @@ struct thread : public sith::thread {
         });
         sw.queue_present(dq.queue());
       }
+
+      dq.queue()->device_wait_idle();
     }
   }
 } t;
