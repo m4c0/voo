@@ -87,6 +87,9 @@ public:
   auto cmd_render_pass(vee::render_pass_begin rpb) const {
     return voo::cmd_render_pass(render_pass_begin(traits::move(rpb)));
   }
+  auto cmd_render_pass() const {
+    return voo::cmd_render_pass(render_pass_begin({ m_cb.cb() }));
+  }
 
   void queue_submit(queue *q) { m_sync.queue_submit(q, m_cb.cb()); }
   void queue_present(queue *q) { m_swc.queue_present(q, m_sync.rnd_finished_sema()); }
