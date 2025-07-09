@@ -99,11 +99,12 @@ export constexpr auto load_sires_image(jute::view file) {
       auto cpool = q->create_command_pool();
       auto cb = cpool.allocate_primary_command_buffer();
   
-      cmd_buf_one_time_submit::build(cb, [&](auto cb) {
+      {
+        cmd_buf_one_time_submit ots { cb };
         vee::cmd_pipeline_barrier(cb, *bi->img, vee::from_host_to_transfer);
         vee::cmd_copy_buffer_to_image(cb, ext, *host.buffer, *bi->img);
         vee::cmd_pipeline_barrier(cb, *bi->img, vee::from_transfer_to_fragment);
-      });
+      }
       q->queue_submit({
         .fence = f,
         .command_buffer = cb,

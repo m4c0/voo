@@ -40,10 +40,6 @@ public:
     vee::cmd_bind_vertex_buffers(cb, idx, *m_qbuf);
     vee::cmd_draw(cb, quad::v_count, inst, first_inst);
   }
-  void run(const cmd_render_pass &scb, unsigned idx, unsigned inst = 1,
-           unsigned first_inst = 0) const {
-    run(*scb, idx, inst, first_inst);
-  }
 
   static auto vertex_input_bind() {
     return vee::vertex_input_bind(sizeof(float) * quad::v_size);

@@ -57,12 +57,13 @@ struct thread : public sith::thread {
       while (!interrupted()) {
         sw.acquire_next_image();
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
-          auto scb = sw.cmd_render_pass({ *pcb });
-          vee::cmd_set_viewport(*pcb, sw.extent());
-          vee::cmd_set_scissor(*pcb, sw.extent());
-          vee::cmd_bind_gr_pipeline(*pcb, *gp);
-          vee::cmd_bind_vertex_buffers(*pcb, 1, u.data().local_buffer());
-          quad.run(*pcb, 0, 2);
+          auto scb = sw.cmd_render_pass();
+          auto cb = sw.command_buffer();
+          vee::cmd_set_viewport(cb, sw.extent());
+          vee::cmd_set_scissor(cb, sw.extent());
+          vee::cmd_bind_gr_pipeline(cb, *gp);
+          vee::cmd_bind_vertex_buffers(cb, 1, u.data().local_buffer());
+          quad.run(cb, 0, 2);
         });
         sw.queue_present(dq.queue());
       }

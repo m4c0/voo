@@ -15,7 +15,7 @@ int main() {
   for (auto i = 0; i < 5; i++) {
     f.wait_and_reset();
 
-    voo::cmd_buf_one_time_submit::build(cb, [](auto cb) {});
+    { voo::cmd_buf_one_time_submit { cb }; };
     q->queue_submit({
       .fence = f,
       .command_buffer = cb,

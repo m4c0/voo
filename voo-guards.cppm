@@ -10,75 +10,32 @@ namespace voo {
   template<typename T>
   concept consumes_cmd_buf = traits::is_callable_r<T, void, vee::command_buffer>;
 
-  export using command_buffer = hay<vee::command_buffer, nullptr, vee::end_cmd_buf>;
+  template<auto F> using cb_guard = hay<
+    vee::command_buffer,
+    [](vee::command_buffer cb) {
+      F(cb);
+      return cb;
+    },
+    vee::end_cmd_buf>;
 
-export class cmd_buf_one_time_submit {
-  command_buffer m_cb;
+  export using cmd_buf_one_time_submit = cb_guard<vee::begin_cmd_buf_one_time_submit>;
+  export using cmd_buf_sim_use = cb_guard<vee::begin_cmd_buf_sim_use>;
 
-public:
-  explicit cmd_buf_one_time_submit(vee::command_buffer cb) : m_cb{cb} {
-    vee::begin_cmd_buf_one_time_submit(cb);
-  }
+  export using cmd_buf_render_pass_continue = hay<
+    vee::command_buffer,
+    [](vee::command_buffer cb, vee::render_pass::type rp) {
+      vee::begin_cmd_buf_render_pass_continue(cb, rp);
+      return cb;
+    },
+    vee::end_cmd_buf>;
 
-  [[nodiscard]] constexpr vee::command_buffer operator*() const { return m_cb; }
-
-  static void build(vee::command_buffer cb, consumes_cmd_buf auto &&fn) {
-    cmd_buf_one_time_submit pcb{cb};
-    fn(*pcb);
-  }
-};
-
-export class cmd_buf_sim_use {
-  command_buffer m_cb;
-
-public:
-  explicit cmd_buf_sim_use(vee::command_buffer cb) : m_cb{cb} {
-    vee::begin_cmd_buf_sim_use(cb);
-  }
-
-  [[nodiscard]] constexpr vee::command_buffer operator*() const { return m_cb; }
-
-  static void build(vee::command_buffer cb, consumes_cmd_buf auto &&fn) {
-    cmd_buf_sim_use pcb{cb};
-    fn(*pcb);
-  }
-};
-
-export class cmd_render_pass {
-  hay<vee::command_buffer, nullptr, vee::cmd_end_render_pass> m_cb;
-
-public:
-  explicit cmd_render_pass(const vee::render_pass_begin &rpb)
-      : m_cb{rpb.command_buffer} {
-    vee::cmd_begin_render_pass(rpb);
-  }
-
-  [[nodiscard]] constexpr vee::command_buffer operator*() const { return m_cb; }
-
-  static void build(const vee::render_pass_begin &rbp, consumes_cmd_buf auto &&fn) {
-    cmd_render_pass pcb{rbp};
-    fn(*pcb);
-  }
-};
-
-export class cmd_buf_render_pass_continue {
-  command_buffer m_cb;
-
-public:
-  explicit cmd_buf_render_pass_continue(vee::command_buffer cb,
-                                        vee::render_pass::type rp)
-      : m_cb{cb} {
-    vee::begin_cmd_buf_render_pass_continue(cb, rp);
-  }
-
-  [[nodiscard]] constexpr vee::command_buffer operator*() const { return m_cb; }
-
-  static void build(vee::command_buffer cb, vee::render_pass::type rp,
-                    consumes_cmd_buf auto &&fn) {
-    cmd_buf_render_pass_continue pcb{cb, rp};
-    fn(*pcb);
-  }
-};
+  export using cmd_render_pass = hay<
+    vee::command_buffer,
+    [](const vee::render_pass_begin & rpb) {
+      vee::cmd_begin_render_pass(rpb);
+      return rpb.command_buffer;
+    },
+    vee::cmd_end_render_pass>;
 
   export class present_guard {
     queue * m_q;
