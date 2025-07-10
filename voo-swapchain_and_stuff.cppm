@@ -95,7 +95,10 @@ public:
   void queue_present(queue *q) { m_swc.queue_present(q, m_sync.rnd_finished_sema()); }
 
   void queue_one_time_submit(queue *q, auto &&fn) {
-    fn(voo::cmd_buf_one_time_submit{m_cb.cb()});
+    {
+      voo::cmd_buf_one_time_submit ots { m_cb.cb() };
+      fn();
+    }
     queue_submit(q);
   }
 };
