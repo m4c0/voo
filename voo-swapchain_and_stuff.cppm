@@ -73,6 +73,7 @@ public:
 
   auto render_pass_begin() const {
     return vee::render_pass_begin {
+      .command_buffer = m_cb.cb(),
       .render_pass = m_rp,
       .framebuffer = framebuffer(),
       .extent = extent(),
@@ -89,7 +90,7 @@ public:
     return voo::cmd_render_pass(render_pass_begin(traits::move(rpb)));
   }
   auto cmd_render_pass() const {
-    return voo::cmd_render_pass(render_pass_begin({ m_cb.cb() }));
+    return voo::cmd_render_pass(render_pass_begin());
   }
 
   void queue_submit(queue *q) { m_sync.queue_submit(q, m_cb.cb()); }
