@@ -79,6 +79,7 @@ public:
     };
   }
   auto render_pass_begin(vee::render_pass_begin rpb) const {
+    if (!rpb.command_buffer) rpb.command_buffer = m_cb.cb();
     rpb.render_pass = m_rp;
     rpb.framebuffer = framebuffer();
     rpb.extent = extent();
