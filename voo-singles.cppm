@@ -1,7 +1,22 @@
-export module voo:single_dset;
+export module voo:singles;
+import :queue;
 import vee;
 
 namespace voo {
+  export class single_cb {
+    vee::command_pool m_cp;
+    vee::command_buffer m_cb;
+  public:
+    explicit single_cb()
+      : single_cb { voo::queue::instance()->queue_family() }
+    {}
+    explicit single_cb(unsigned qf)
+      : m_cp { vee::create_command_pool(qf) }
+      , m_cb { vee::allocate_primary_command_buffer(*m_cp) } {}
+
+    [[nodiscard]] constexpr auto cb() const { return m_cb; }
+  };
+
   export class single_dset {
     vee::descriptor_set_layout m_dsl;
     vee::descriptor_pool m_pool;
