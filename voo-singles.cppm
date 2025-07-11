@@ -1,4 +1,5 @@
 export module voo:singles;
+import :device_and_queue;
 import :queue;
 import vee;
 
@@ -40,4 +41,23 @@ namespace voo {
       vee::combined_image_sampler(b_count),
     } {};
   };
+
+  export inline auto single_att_render_pass(vee::physical_device pd, vee::surface::type s) {
+    return vee::create_render_pass({
+      .attachments {{
+        vee::create_colour_attachment(pd, s),
+      }},
+      .subpasses {{
+        vee::create_subpass({
+          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
+        }),
+      }},
+      .dependencies {{
+        vee::create_colour_dependency(),
+      }},
+    });
+  }
+  export inline auto single_att_render_pass(const voo::device_and_queue & dq) {
+    return single_att_render_pass(dq.physical_device(), dq.surface());
+  }
 }

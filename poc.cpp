@@ -28,23 +28,7 @@ struct thread : public sith::thread {
 
   void run() {
     voo::device_and_queue dq { "poc-voo", casein::native_ptr };
-    vee::render_pass rp = vee::create_render_pass({
-      .attachments {{
-        vee::create_colour_attachment(dq.physical_device(), dq.surface()),
-      }},
-      .subpasses {{
-        vee::create_subpass({
-          .colours {{
-            vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal),
-          }},
-        }),
-      }},
-      .dependencies {{
-        vee::create_colour_dependency(),
-      }},
-    });
-
-
+    auto rp = voo::single_att_render_pass(dq.physical_device(), dq.surface());
     while (!interrupted()) {
       voo::swapchain_and_stuff sw { dq, *rp };
       voo::one_quad quad { dq };
