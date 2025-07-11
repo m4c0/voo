@@ -28,7 +28,7 @@ struct thread : public sith::thread {
 
   void run() {
     voo::device_and_queue dq { "poc-voo", casein::native_ptr };
-    auto rp = voo::single_att_render_pass(dq.physical_device(), dq.surface());
+    auto rp = voo::single_att_render_pass(dq);
     while (!interrupted()) {
       voo::swapchain_and_stuff sw { dq, *rp };
       voo::one_quad quad { dq };
