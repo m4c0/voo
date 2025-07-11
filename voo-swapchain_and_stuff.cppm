@@ -18,36 +18,22 @@ export class swapchain_and_stuff {
 
   voo::frame_sync_stuff m_sync {};
   voo::swapchain m_swc;
-  hai::array<vee::framebuffer> m_fbs {};
+  hai::array<vee::framebuffer> m_fbs;
 
   voo::single_cb m_cb;
 
 public:
-  swapchain_and_stuff(const device_and_queue &dq, vee::render_pass::type rp,
-                      hai::array<vee::image_view::type> extras = {})
-      : swapchain_and_stuff(dq.physical_device(), dq.surface(),
-                            rp, dq.queue_family(),
-                            traits::move(extras)) {}
+  swapchain_and_stuff(const device_and_queue &dq, vee::render_pass::type rp, auto *... ivs) :
+    swapchain_and_stuff(dq.physical_device(), dq.surface(), rp, dq.queue_family(), ivs...)
+  {}
 
   swapchain_and_stuff(vee::physical_device pd, vee::surface::type s,
                       vee::render_pass::type rp, unsigned qf,
-                      hai::array<vee::image_view::type> extras = {})
+                      auto *... ivs)
       : m_rp{rp}
       , m_swc { pd, s }
+      , m_fbs { m_swc.create_framebuffers(rp, ivs...) }
       , m_cb { qf } {
-    m_fbs.set_capacity(m_swc.count());
-    for (auto i = 0; i < m_swc.count(); i++) {
-      hai::array<vee::image_view::type> attachments { extras.size() + 1 };
-      for (auto j = 0; j < extras.size(); j++) {
-        attachments[j + 1] = extras[j];
-      }
-      attachments[0] = m_swc.image_view(i);
-      m_fbs[i] = vee::create_framebuffer({
-          .render_pass = m_rp,
-          .attachments = traits::move(attachments),
-          .extent = m_swc.extent(),
-      });
-    }
   }
 
   [[nodiscard]] constexpr const auto command_buffer() const { return m_cb.cb(); }

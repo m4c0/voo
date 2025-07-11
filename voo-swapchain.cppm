@@ -40,17 +40,17 @@ export namespace voo {
       return static_cast<float>(extent().width) / static_cast<float>(extent().height);
     }
 
-    [[nodiscard]] constexpr auto create_framebuffer(unsigned idx, const vee::render_pass::type rp) const {
+    [[nodiscard]] constexpr auto create_framebuffer(unsigned idx, const vee::render_pass::type rp, auto... ivs) const {
       return vee::create_framebuffer({
         .render_pass = rp,
-        .attachments {{ image_view(idx) }},
+        .attachments {{ image_view(idx), ivs... }},
         .extent = extent(),
       });
     }
-    [[nodiscard]] constexpr auto create_framebuffers(const vee::render_pass::type rp) const {
+    [[nodiscard]] constexpr auto create_framebuffers(const vee::render_pass::type rp, auto... ivs) const {
       hai::array<vee::framebuffer> res { count() };
       for (auto i = 0; i < res.size(); i++) {
-        res[i] = create_framebuffer(i, rp);
+        res[i] = create_framebuffer(i, rp, ivs...);
       }
       return res;
     }
