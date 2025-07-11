@@ -28,8 +28,25 @@ struct thread : public sith::thread {
 
   void run() {
     voo::device_and_queue dq { "poc-voo", casein::native_ptr };
+    vee::render_pass rp = vee::create_render_pass({
+      .attachments {{
+        vee::create_colour_attachment(dq.physical_device(), dq.surface()),
+      }},
+      .subpasses {{
+        vee::create_subpass({
+          .colours {{
+            vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal),
+          }},
+        }),
+      }},
+      .dependencies {{
+        vee::create_colour_dependency(),
+      }},
+    });
+
+
     while (!interrupted()) {
-      voo::swapchain_and_stuff sw { dq };
+      voo::swapchain_and_stuff sw { dq, *rp };
       voo::one_quad quad { dq };
 
       constexpr const unsigned sz = 2 * sizeof(inst);
@@ -39,7 +56,7 @@ struct thread : public sith::thread {
       vee::pipeline_layout pl = vee::create_pipeline_layout();
       auto gp = vee::create_graphics_pipeline({
           .pipeline_layout = *pl,
-          .render_pass = dq.render_pass(),
+          .render_pass = *rp,
           .shaders {
               voo::shader("poc.vert.spv").pipeline_vert_stage(),
               voo::shader("poc.frag.spv").pipeline_frag_stage(),

@@ -15,7 +15,6 @@ class device_and_queue : no::no {
   vee::surface m_s {};
   vee::physical_device m_pd;
   vee::device m_d;
-  vee::render_pass m_rp;
   queue m_q;
   unsigned m_qf;
 
@@ -40,7 +39,6 @@ public:
     m_qf = qf;
 
     m_d = vee::create_single_queue_device(pd, qf);
-    m_rp = vee::create_render_pass(pd, *m_s);
     m_q = voo::queue{qf};
     voo::queue::instance ()= &m_q;
   }
@@ -48,7 +46,6 @@ public:
 
   [[nodiscard]] constexpr const auto physical_device() const { return m_pd; }
   [[nodiscard]] constexpr const auto queue_family() const { return m_qf; }
-  [[nodiscard]] constexpr const auto render_pass() const { return *m_rp; }
   [[nodiscard]] constexpr const auto surface() const { return *m_s; }
   [[nodiscard]] constexpr auto *queue() { return &m_q; }
 

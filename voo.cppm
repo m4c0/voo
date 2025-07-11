@@ -12,7 +12,6 @@ export import :images;
 export import :mapmem;
 export import :offscreen;
 export import :one_quad;
-export import :one_quad_render;
 export import :shader;
 export import :single_cb;
 export import :single_dset;

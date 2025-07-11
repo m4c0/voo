@@ -20,15 +20,9 @@ export class swapchain_and_stuff {
   voo::swapchain m_swc;
   hai::array<vee::framebuffer> m_fbs {};
 
-  offscreen::depth_buffer m_depth;
-
   voo::single_cb m_cb;
 
 public:
-  explicit swapchain_and_stuff(const device_and_queue &dq,
-                               hai::array<vee::image_view::type> extras = {})
-      : swapchain_and_stuff(dq, dq.render_pass(), traits::move(extras)) {}
-
   swapchain_and_stuff(const device_and_queue &dq, vee::render_pass::type rp,
                       hai::array<vee::image_view::type> extras = {})
       : swapchain_and_stuff(dq.physical_device(), dq.surface(),
@@ -40,16 +34,14 @@ public:
                       hai::array<vee::image_view::type> extras = {})
       : m_rp{rp}
       , m_swc { pd, s }
-      , m_depth { pd, m_swc.extent() }
       , m_cb { qf } {
     m_fbs.set_capacity(m_swc.count());
     for (auto i = 0; i < m_swc.count(); i++) {
-      hai::array<vee::image_view::type> attachments { extras.size() + 2 };
+      hai::array<vee::image_view::type> attachments { extras.size() + 1 };
       for (auto j = 0; j < extras.size(); j++) {
         attachments[j + 1] = extras[j];
       }
       attachments[0] = m_swc.image_view(i);
-      attachments[extras.size() + 1] = m_depth.image_view();
       m_fbs[i] = vee::create_framebuffer({
           .render_pass = m_rp,
           .attachments = traits::move(attachments),
