@@ -13,7 +13,7 @@ export class shader {
       return vee::create_shader_module(from);
     } else {
       silog::log(silog::info, "Loading shader %s", from.cstr().begin());
-      return vee::create_shader_module(sires::jojo_cstr(from));
+      return vee::create_shader_module(sires::slurp(from));
     }
   }
 
