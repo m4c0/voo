@@ -6,6 +6,7 @@ import :images;
 import :mapmem;
 import :updater;
 import :queue;
+import dotz;
 import jute;
 import silog;
 import sires;
@@ -72,7 +73,7 @@ namespace voo {
     return [=](vee::physical_device pd) { return load_sires_image(file, pd); };
   }
 
-  export void load_image(jute::view file, vee::physical_device pd, queue * q, voo::bound_image * bi, hai::fn<void> callback) {
+  export void load_image(jute::view file, vee::physical_device pd, queue * q, voo::bound_image * bi, hai::fn<void, dotz::ivec2> callback) {
     // TODO: call this on a different thread
     {
       auto img = stbi::load(sires::slurp(file));
@@ -108,7 +109,7 @@ namespace voo {
       });
   
       f.wait();
-      callback();
+      callback(dotz::ivec2 { w, h });
     }
   }
 } // namespace voo
