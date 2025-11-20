@@ -57,7 +57,7 @@ struct thread : public sith::thread {
 
       while (!interrupted()) {
         sw.acquire_next_image();
-        sw.queue_one_time_submit(dq.queue(), [&] {
+        sw.queue_one_time_submit([&] {
           auto scb = sw.cmd_render_pass();
           auto cb = sw.command_buffer();
           vee::cmd_set_viewport(cb, sw.extent());

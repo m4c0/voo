@@ -72,7 +72,7 @@ public:
   void queue_submit() { m_swc.queue_submit(m_cb.cb()); }
   void queue_present() { m_swc.queue_present(); }
 
-  void queue_one_time_submit(queue *q, auto &&fn) {
+  void queue_one_time_submit(auto &&fn) {
     {
       voo::cmd_buf_one_time_submit ots { m_cb.cb() };
       fn();
