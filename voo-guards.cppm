@@ -40,10 +40,24 @@ namespace voo {
   export class present_guard {
     swapchain * m_swc;
   public:
-    present_guard(swapchain * sc) : m_swc { sc } {
+    explicit present_guard(swapchain * sc) : m_swc { sc } {
       sc->acquire_next_image();
     }
     ~present_guard() {
+      m_swc->queue_present();
+    }
+  };
+  export class ots_present_guard {
+    swapchain * m_swc;
+    vee::command_buffer m_cb;
+  public:
+    ots_present_guard(swapchain * sc, vee::command_buffer cb) : m_swc { sc }, m_cb { cb } {
+      m_swc->acquire_next_image();
+      vee::begin_cmd_buf_one_time_submit(m_cb);
+    }
+    ~ots_present_guard() {
+      vee::end_cmd_buf(m_cb);
+      m_swc->queue_submit(m_cb);
       m_swc->queue_present();
     }
   };
