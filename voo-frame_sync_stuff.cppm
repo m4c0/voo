@@ -12,8 +12,8 @@ export namespace voo {
     [[nodiscard]] constexpr auto img_available_sema() const { return *m_img_available_sema; }
     [[nodiscard]] constexpr auto rnd_finished_sema() const { return *m_rnd_finished_sema; }
 
-    void queue_submit(queue * q, vee::command_buffer cb) const {
-      q->queue_submit({
+    void queue_submit(vee::command_buffer cb) const {
+      queue::submit({
           .fence = *m_f,
           .command_buffer = cb,
           .wait_semaphore = *m_img_available_sema,

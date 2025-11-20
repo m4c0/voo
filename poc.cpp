@@ -66,7 +66,7 @@ struct thread : public sith::thread {
           vee::cmd_bind_vertex_buffers(cb, 1, u.data().local_buffer());
           quad.run(cb, 0, 2);
         });
-        sw.queue_present(dq.queue());
+        sw.queue_present();
       }
 
       dq.queue()->device_wait_idle();

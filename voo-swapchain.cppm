@@ -1,6 +1,7 @@
 export module voo:swapchain;
 import :device_and_queue;
 import :queue;
+import :frame_sync_stuff;
 import hai;
 import traits;
 import vee;
@@ -9,6 +10,7 @@ using traits::is_callable;
 
 export namespace voo {
   class swapchain {
+    voo::frame_sync_stuff m_sync {};
     vee::swapchain m_swc;
     hai::array<vee::image_view> m_civs;
     vee::extent m_ext;
@@ -55,14 +57,19 @@ export namespace voo {
       return res;
     }
 
-    void acquire_next_image(vee::semaphore::type sema) {
-      m_idx = vee::acquire_next_image(*m_swc, sema);
+    void acquire_next_image() {
+      m_sync.wait_and_reset_fence();
+      m_idx = vee::acquire_next_image(*m_swc, m_sync.img_available_sema());
     }
 
-    void queue_present(queue * q, vee::semaphore::type sema) {
-      q->queue_present({
+    void queue_submit(vee::command_buffer cb) {
+      m_sync.queue_submit(cb);
+    }
+
+    void queue_present() {
+      queue::present({
         .swapchain = *m_swc,
-        .wait_semaphore = sema,
+        .wait_semaphore = m_sync.rnd_finished_sema(),
         .image_index = m_idx,
       });
     }

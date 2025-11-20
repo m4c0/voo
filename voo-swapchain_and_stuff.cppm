@@ -16,7 +16,6 @@ concept is_fn_taking_const_ref = requires(T t, const A &a) { t(a); };
 export class swapchain_and_stuff {
   vee::render_pass::type m_rp;
 
-  voo::frame_sync_stuff m_sync {};
   voo::swapchain m_swc;
   hai::array<vee::framebuffer> m_fbs;
 
@@ -45,8 +44,7 @@ public:
   }
 
   void acquire_next_image() {
-    m_sync.wait_and_reset_fence();
-    m_swc.acquire_next_image(m_sync.img_available_sema());
+    m_swc.acquire_next_image();
   }
 
   auto render_pass_begin() const {
@@ -71,15 +69,15 @@ public:
     return voo::cmd_render_pass(render_pass_begin());
   }
 
-  void queue_submit(queue *q) { m_sync.queue_submit(q, m_cb.cb()); }
-  void queue_present(queue *q) { m_swc.queue_present(q, m_sync.rnd_finished_sema()); }
+  void queue_submit() { m_swc.queue_submit(m_cb.cb()); }
+  void queue_present() { m_swc.queue_present(); }
 
   void queue_one_time_submit(queue *q, auto &&fn) {
     {
       voo::cmd_buf_one_time_submit ots { m_cb.cb() };
       fn();
     }
-    queue_submit(q);
+    queue_submit();
   }
 };
 } // namespace voo
