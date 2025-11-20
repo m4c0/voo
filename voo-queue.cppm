@@ -1,5 +1,4 @@
 export module voo:queue;
-import :command_pool;
 import hay;
 import mtx;
 import vee;
@@ -17,8 +16,6 @@ public:
   explicit queue(unsigned qf) : m_q{vee::get_queue_for_family(qf)}, m_qf{qf} {}
 
   [[nodiscard]] constexpr auto queue_family() const { return m_qf; }
-
-  [[nodiscard]] auto create_command_pool() const { return voo::command_pool { m_qf }; }
 
   void device_wait_idle() {
     mtx::lock l{&m_qmtx};

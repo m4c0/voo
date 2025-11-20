@@ -1,4 +1,5 @@
 export module voo:sires_image;
+import :command_pool;
 import :device_and_queue;
 import :guards;
 import :h2l_image;
@@ -73,7 +74,7 @@ namespace voo {
     return [=](vee::physical_device pd) { return load_sires_image(file, pd); };
   }
 
-  export void load_image(jute::view file, vee::physical_device pd, queue * q, voo::bound_image * bi, hai::fn<void, dotz::ivec2> callback) {
+  export void load_image(jute::view file, vee::physical_device pd, voo::bound_image * bi, hai::fn<void, dotz::ivec2> callback) {
     // TODO: call this on a different thread
     {
       auto img = stbi::load(sires::slurp(file));
@@ -94,7 +95,7 @@ namespace voo {
       bi->iv = vee::create_image_view(*bi->img, fmt);
   
       fence f { false };
-      auto cpool = q->create_command_pool();
+      voo::command_pool cpool {};
       auto cb = cpool.allocate_primary_command_buffer();
   
       {
@@ -103,7 +104,7 @@ namespace voo {
         vee::cmd_copy_buffer_to_image(cb, ext, *host.buffer, *bi->img);
         vee::cmd_pipeline_barrier(cb, *bi->img, vee::from_transfer_to_fragment);
       }
-      q->queue_submit({
+      queue::universal()->queue_submit({
         .fence = f,
         .command_buffer = cb,
       });
