@@ -15,7 +15,6 @@ class device_and_queue : no::no {
   vee::surface m_s {};
   vee::physical_device m_pd;
   vee::device m_d;
-  queue m_q;
   unsigned m_qf;
 
 public:
@@ -27,8 +26,7 @@ public:
     m_qf = qf;
 
     m_d = vee::create_single_queue_device(pd, qf);
-    m_q = voo::queue{qf};
-    voo::queue::instance() = &m_q;
+    voo::queue::universal(qf);
   }
   device_and_queue(const char *app_name, auto native_ptr, bool debug = true) {
     m_i = vee::create_instance(app_name);
@@ -39,15 +37,14 @@ public:
     m_qf = qf;
 
     m_d = vee::create_single_queue_device(pd, qf);
-    m_q = voo::queue{qf};
-    voo::queue::instance ()= &m_q;
+    voo::queue::universal(qf);
   }
   ~device_and_queue() { vee::device_wait_idle(); }
 
   [[nodiscard]] constexpr const auto physical_device() const { return m_pd; }
   [[nodiscard]] constexpr const auto queue_family() const { return m_qf; }
   [[nodiscard]] constexpr const auto surface() const { return *m_s; }
-  [[nodiscard]] constexpr auto *queue() { return &m_q; }
+  [[nodiscard]] constexpr voo::queue * queue() { return queue::universal(); }
 
   [[nodiscard]] auto find_best_surface_image_format() const {
     return vee::find_best_surface_image_format(physical_device(), surface());

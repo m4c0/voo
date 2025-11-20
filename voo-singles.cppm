@@ -9,7 +9,7 @@ namespace voo {
     vee::command_buffer m_cb;
   public:
     explicit single_cb()
-      : single_cb { voo::queue::instance()->queue_family() }
+      : single_cb { voo::queue::universal()->queue_family() }
     {}
     explicit single_cb(unsigned qf)
       : m_cp { vee::create_command_pool(qf) }

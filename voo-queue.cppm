@@ -1,5 +1,6 @@
 export module voo:queue;
 import :command_pool;
+import hay;
 import mtx;
 import vee;
 
@@ -13,7 +14,6 @@ export class queue {
   unsigned m_qf{};
 
 public:
-  constexpr queue() = default;
   explicit queue(unsigned qf) : m_q{vee::get_queue_for_family(qf)}, m_qf{qf} {}
 
   [[nodiscard]] constexpr auto queue_family() const { return m_qf; }
@@ -35,9 +35,21 @@ public:
     vee::queue_submit(si);
   }
 
-  static auto & instance() {
-    static queue * i {};
+  static auto & universal() {
+    static hay<queue *> i { nullptr };
     return i;
+  }
+  static void universal(unsigned qf) {
+    universal() = { new queue { qf } };
+  }
+  static void wait_idle() {
+    universal()->device_wait_idle();
+  }
+  static void present(vee::present_info si) {
+    universal()->queue_present(si);
+  }
+  static void submit(vee::submit_info si) {
+    universal()->queue_submit(si);
   }
 };
 }
