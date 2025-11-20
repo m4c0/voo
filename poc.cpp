@@ -17,7 +17,7 @@ void create_instances(voo::h2l_buffer * insts) {
   static_cast<inst *>(*m)[1] = { -1, -1 };
 }
 
-// Use "vapp" for more standardised control
+// Use "vapp" of "vinyl" for more standardised control
 struct thread : public sith::thread {
   sith::run_guard m_run{};
 
