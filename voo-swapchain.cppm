@@ -17,6 +17,11 @@ export namespace voo {
     unsigned m_idx;
 
   public:
+    struct render_pass_pair {
+      vee::framebuffer fb;
+      vee::render_pass_begin rpb;
+    };
+
     explicit swapchain(const device_and_queue & dq)
       : swapchain { dq.physical_device(), dq.surface() }
     {}
@@ -53,6 +58,18 @@ export namespace voo {
       hai::array<vee::framebuffer> res { count() };
       for (auto i = 0; i < res.size(); i++) {
         res[i] = create_framebuffer(i, rp, ivs...);
+      }
+      return res;
+    }
+
+    [[nodiscard]] constexpr auto create_pairs(vee::render_pass_begin rpb) {
+      hai::array<render_pass_pair> res { count() };
+      for (auto i = 0; i < res.size(); i++) {
+        res[i].fb = create_framebuffer(i, rpb.render_pass);
+
+        rpb.framebuffer = *(res[i].fb);
+        rpb.extent = m_ext;
+        res[i].rpb = rpb;
       }
       return res;
     }
