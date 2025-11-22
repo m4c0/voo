@@ -7,7 +7,7 @@ int main() {
   voo::device_and_queue dq { "poc-queue" };
   auto q = dq.queue();
 
-  auto cpool = q->create_command_pool();
+  voo::command_pool cpool {};
 
   vee::command_buffer cb = cpool.allocate_primary_command_buffer();
   voo::fence f {{}};

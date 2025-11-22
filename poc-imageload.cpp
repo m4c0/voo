@@ -10,7 +10,7 @@ int main() {
   voo::device_and_queue dq { "poc-imageload" };
 
   voo::bound_image img {};
-  voo::load_image("poc-imageload.png", dq.physical_device(), dq.queue(), &img, [](auto size) {
+  voo::load_image("poc-imageload.png", dq.physical_device(), &img, [](auto size) {
     silog::log(silog::info, "%dx%d Image loaded", size.x, size.y);
   });
 
