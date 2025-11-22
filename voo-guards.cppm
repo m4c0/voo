@@ -31,8 +31,8 @@ namespace voo {
 
   export using cmd_render_pass = hay<
     vee::command_buffer,
-    [](const vee::render_pass_begin & rpb) {
-      vee::cmd_begin_render_pass(rpb);
+    [](const vee::render_pass_begin & rpb, bool inlined) {
+      vee::cmd_begin_render_pass(rpb, inlined);
       return rpb.command_buffer;
     },
     vee::cmd_end_render_pass>;

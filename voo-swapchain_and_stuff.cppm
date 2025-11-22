@@ -63,10 +63,10 @@ public:
     return rpb;
   }
   auto cmd_render_pass(vee::render_pass_begin rpb) const {
-    return voo::cmd_render_pass(render_pass_begin(traits::move(rpb)));
+    return voo::cmd_render_pass(render_pass_begin(traits::move(rpb)), true);
   }
   auto cmd_render_pass() const {
-    return voo::cmd_render_pass(render_pass_begin());
+    return voo::cmd_render_pass(render_pass_begin(), true);
   }
 
   void queue_submit() { m_swc.queue_submit(m_cb.cb()); }
