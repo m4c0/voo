@@ -35,6 +35,8 @@ public:
   explicit one_quad(const device_and_queue &dq)
       : one_quad(dq.physical_device()) {}
 
+  [[nodiscard]] constexpr auto buffer() const { return *m_qbuf; }
+
   void run(vee::command_buffer cb, unsigned idx, unsigned inst = 1,
            unsigned first_inst = 0) const {
     vee::cmd_bind_vertex_buffers(cb, idx, *m_qbuf);
