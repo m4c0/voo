@@ -22,8 +22,10 @@ struct thread : public sith::thread {
   sith::run_guard m_run{};
 
   thread() {
-    casein::handle(casein::CREATE_WINDOW, [this] { m_run = sith::run_guard{this}; });
-    casein::handle(casein::QUIT, [this] { m_run = {}; });
+    using namespace casein;
+    handle(CREATE_WINDOW, [this] { m_run = sith::run_guard{this}; });
+    handle(KEY_DOWN, K_Q, [] { interrupt(IRQ_QUIT); });
+    handle(QUIT, [this] { m_run = {}; });
   }
 
   void run() {
