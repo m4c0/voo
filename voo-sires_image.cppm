@@ -15,6 +15,7 @@ import sith;
 import stubby;
 import traits;
 import vee;
+import wagen;
 
 namespace voo {
   export auto load_image_file_as_buffer(jute::view file, vee::physical_device pd) {
@@ -112,5 +113,8 @@ namespace voo {
       f.wait();
       callback(dotz::ivec2 { w, h });
     }
+  }
+  export void load_image(jute::view file, voo::bound_image * bi, hai::fn<void, dotz::ivec2> callback) {
+    return load_image(file, wagen::physical_device(), bi, callback);
   }
 } // namespace voo
