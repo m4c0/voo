@@ -44,8 +44,8 @@ struct thread : public sith::thread {
           .pipeline_layout = *pl,
           .render_pass = *rp,
           .shaders {
-              voo::shader("poc.vert.spv").pipeline_vert_stage(),
-              voo::shader("poc.frag.spv").pipeline_frag_stage(),
+              *voo::vert_shader("poc.vert.spv"),
+              *voo::frag_shader("poc.frag.spv"),
           },
           .bindings {
               quad.vertex_input_bind(),

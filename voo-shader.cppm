@@ -17,24 +17,39 @@ export class shader {
     }
   }
 
+protected:
+  [[nodiscard]] constexpr auto mod() const { return *m_mod; }
+
 public:
   constexpr shader() = default;
   explicit shader(const void * data, unsigned size) : m_mod{vee::create_shader_module(data, size)} {}
   explicit shader(jute::view src_or_res) : m_mod { create_shader(src_or_res) } {}
 
   explicit constexpr operator bool() const { return *m_mod; }
-
-  [[nodiscard]] auto pipeline_frag_stage(const char *fn = "main") {
-    return vee::pipeline_frag_stage(*m_mod, fn);
-  }
-  [[nodiscard]] auto pipeline_frag_stage(const char *fn, const auto & k) {
-    return vee::pipeline_frag_stage(*m_mod, fn, k);
-  }
-  [[nodiscard]] auto pipeline_vert_stage(const char *fn = "main") {
-    return vee::pipeline_vert_stage(*m_mod, fn);
-  }
-  [[nodiscard]] auto pipeline_vert_stage(const char *fn, const auto & k) {
-    return vee::pipeline_vert_stage(*m_mod, fn, k);
-  }
 };
-} // namespace voo
+
+  export struct frag_shader : shader {
+    using shader::shader;
+  
+    [[nodiscard]] auto pipeline_stage(const char *fn = "main") const {
+      return vee::pipeline_frag_stage(mod(), fn);
+    }
+    [[nodiscard]] auto pipeline_stage(const char *fn, const auto & k) const {
+      return vee::pipeline_frag_stage(mod(), fn, k);
+    }
+    [[nodiscard]] auto operator*() const { return pipeline_stage(); }
+  };
+
+  export struct vert_shader : shader {
+    using shader::shader;
+  
+    [[nodiscard]] auto pipeline_stage(const char *fn = "main") const {
+      return vee::pipeline_vert_stage(mod(), fn);
+    }
+    [[nodiscard]] auto pipeline_stage(const char *fn, const auto & k) const {
+      return vee::pipeline_vert_stage(mod(), fn, k);
+    }
+
+    [[nodiscard]] auto operator*() const { return pipeline_stage(); }
+  };
+}
