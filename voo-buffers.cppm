@@ -1,5 +1,6 @@
 export module voo:buffers;
 import vee;
+import wagen;
 
 namespace voo {
   export struct bound_buffer {
@@ -26,6 +27,12 @@ namespace voo {
         vee::buffer_usage usage = vee::buffer_usage::transfer_src_buffer, 
         auto ... usages) {
       return create(vee::find_host_memory_type_index(pd), sz, usage, usages...);
+    }
+    [[nodiscard]] static auto create_from_host(
+        unsigned sz, 
+        vee::buffer_usage usage = vee::buffer_usage::transfer_src_buffer, 
+        auto ... usages) {
+      return create_from_host(wagen::physical_device(), sz, usage, usages...);
     }
     [[nodiscard]] static auto create_from_device_local(
         vee::physical_device pd, unsigned sz, 
