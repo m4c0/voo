@@ -1,6 +1,7 @@
 export module voo:offscreen;
 import :mapmem;
 import vee;
+import wagen;
 
 export namespace voo::offscreen {
   class colour_buffer {
@@ -32,7 +33,7 @@ export namespace voo::offscreen {
 
   public:
     constexpr depth_buffer() = default;
-    explicit depth_buffer(vee::extent ext) : depth_buffer { vee::physical_device(), ext } {}
+    explicit depth_buffer(vee::extent ext) : depth_buffer { wagen::physical_device(), ext } {}
     depth_buffer(vee::physical_device pd, vee::extent ext) {
       m_img = vee::create_depth_image(ext);
       m_mem = vee::create_local_image_memory(pd, *m_img);
