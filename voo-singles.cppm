@@ -60,4 +60,26 @@ namespace voo {
   export inline auto single_att_render_pass(const voo::device_and_queue & dq) {
     return single_att_render_pass(dq.physical_device(), dq.surface());
   }
+
+  export inline auto single_att_depth_render_pass(vee::physical_device pd, vee::surface::type s) {
+    return vee::create_render_pass({
+      .attachments {{
+        vee::create_colour_attachment(pd, s),
+        vee::create_depth_attachment(),
+      }},
+      .subpasses {{
+        vee::create_subpass({
+          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
+          .depth_stencil = vee::create_attachment_ref(1, vee::image_layout_depth_stencil_attachment_optimal),
+        }),
+      }},
+      .dependencies {{
+        vee::create_colour_dependency(),
+        vee::create_depth_dependency(),
+      }},
+    });
+  }
+  export inline auto single_att_depth_render_pass(const voo::device_and_queue & dq) {
+    return single_att_depth_render_pass(dq.physical_device(), dq.surface());
+  }
 }
