@@ -26,11 +26,12 @@ export namespace voo::offscreen {
   };
 
   class depth_buffer {
-    vee::image m_img;
-    vee::device_memory m_mem;
-    vee::image_view m_iv;
+    vee::image m_img {};
+    vee::device_memory m_mem {};
+    vee::image_view m_iv {};
 
   public:
+    constexpr depth_buffer() = default;
     explicit depth_buffer(vee::extent ext) : depth_buffer { vee::physical_device(), ext } {}
     depth_buffer(vee::physical_device pd, vee::extent ext) {
       m_img = vee::create_depth_image(ext);
