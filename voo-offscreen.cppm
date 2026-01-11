@@ -5,28 +5,6 @@ import vee;
 import wagen;
 
 export namespace voo::offscreen {
-  class colour_buffer {
-    vee::image m_img;
-    vee::device_memory m_mem;
-    vee::image_view m_iv;
-
-  public:
-    constexpr colour_buffer() = default;
-    colour_buffer(vee::physical_device pd, vee::extent ext, vee::format fmt, auto... usages) {
-      m_img = vee::create_image(ext, fmt, vee::image_usage_colour_attachment, usages...);
-      m_mem = vee::create_local_image_memory(pd, *m_img);
-      vee::bind_image_memory(*m_img, *m_mem);
-      m_iv = vee::create_image_view(*m_img, fmt);
-    }
-
-    [[nodiscard]] constexpr auto image_view() const { return *m_iv; }
-    [[nodiscard]] constexpr auto image() const { return *m_img; }
-
-    void cmd_copy_to_host(vee::command_buffer cb, vee::offset ofs, vee::extent ext, vee::buffer::type host) {
-      vee::cmd_copy_image_to_buffer(cb, ofs, ext, *m_img, host);
-    }
-  };
-
   class host_buffer {
     vee::buffer m_buf;
     vee::device_memory m_mem;
@@ -43,7 +21,7 @@ export namespace voo::offscreen {
   };
 
   class buffers {
-    colour_buffer m_colour;
+    bound_image m_colour;
     bound_image m_depth;
     host_buffer m_host;
 
@@ -54,7 +32,7 @@ export namespace voo::offscreen {
 
   public:
     buffers(vee::physical_device pd, vee::extent ext, vee::format img)
-        : m_colour { pd, ext, img, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_USAGE_TRANSFER_SRC_BIT }
+        : m_colour { bound_image::create(ext, img, vee::image_usage_colour_attachment, VK_IMAGE_USAGE_TRANSFER_SRC_BIT) }
         , m_depth { bound_image::create_depth(ext) }
         , m_host { pd, ext }
         , m_rp { vee::create_render_pass({
@@ -75,7 +53,7 @@ export namespace voo::offscreen {
         }) }
         , m_fb { vee::create_framebuffer({
               .render_pass = *m_rp,
-              .attachments = { { m_colour.image_view(), *m_depth.iv } },
+              .attachments = { { *m_colour.iv, *m_depth.iv } },
               .extent = ext,
           }) }
         , m_ext { ext } {}
@@ -92,9 +70,9 @@ export namespace voo::offscreen {
         .dstAccessMask = VK_ACCESS_HOST_READ_BIT,
         .oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
         .newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-        .image = m_colour.image(),
+        .image = *m_colour.img,
       });
-      m_colour.cmd_copy_to_host(cb, {}, m_ext, m_host.buffer());
+      vee::cmd_copy_image_to_buffer(cb, {}, m_ext, *m_colour.img, m_host.buffer());
     }
 
     auto render_pass_begin(vee::render_pass_begin rpb) const {
