@@ -1,4 +1,5 @@
 export module voo:offscreen;
+import :images;
 import :mapmem;
 import vee;
 import wagen;
@@ -26,25 +27,6 @@ export namespace voo::offscreen {
     }
   };
 
-  class depth_buffer {
-    vee::image m_img {};
-    vee::device_memory m_mem {};
-    vee::image_view m_iv {};
-
-  public:
-    constexpr depth_buffer() = default;
-    explicit depth_buffer(vee::extent ext) : depth_buffer { wagen::physical_device(), ext } {}
-    depth_buffer(vee::physical_device pd, vee::extent ext) {
-      m_img = vee::create_depth_image(ext);
-      m_mem = vee::create_local_image_memory(pd, *m_img);
-      vee::bind_image_memory(*m_img, *m_mem);
-      m_iv = vee::create_depth_image_view(*m_img);
-    }
-
-    [[nodiscard]] constexpr auto image_view() const { return *m_iv; }
-    [[nodiscard]] constexpr auto image() const { return *m_img; }
-  };
-
   class host_buffer {
     vee::buffer m_buf;
     vee::device_memory m_mem;
@@ -62,7 +44,7 @@ export namespace voo::offscreen {
 
   class buffers {
     colour_buffer m_colour;
-    depth_buffer m_depth;
+    bound_image m_depth;
     host_buffer m_host;
 
     // TODO: voo::framebuffer with rp+fb+ext - they are always used together
@@ -73,7 +55,7 @@ export namespace voo::offscreen {
   public:
     buffers(vee::physical_device pd, vee::extent ext, vee::format img)
         : m_colour { pd, ext, img, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_USAGE_TRANSFER_SRC_BIT }
-        , m_depth { pd, ext }
+        , m_depth { bound_image::create_depth(ext) }
         , m_host { pd, ext }
         , m_rp { vee::create_render_pass({
           .attachments {{
@@ -93,7 +75,7 @@ export namespace voo::offscreen {
         }) }
         , m_fb { vee::create_framebuffer({
               .render_pass = *m_rp,
-              .attachments = { { m_colour.image_view(), m_depth.image_view() } },
+              .attachments = { { m_colour.image_view(), *m_depth.iv } },
               .extent = ext,
           }) }
         , m_ext { ext } {}
