@@ -61,7 +61,7 @@ public:
   constexpr h2l_image() = default;
   explicit h2l_image(const params & p)
       : m_hbuf { p.pd, p.w, p.h, size_of(p.fmt), usage(p.clearable) } {
-    m_img = vee::create_image({ p.w, p.h }, p.fmt);
+    m_img = vee::create_image({ p.w, p.h }, p.fmt, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
     m_mem = vee::create_local_image_memory(p.pd, *m_img);
     vee::bind_image_memory(*m_img, *m_mem);
     m_iv = vee::create_image_view(*m_img, p.fmt);

@@ -4,6 +4,8 @@ import :mapmem;
 import vee;
 import wagen;
 
+using namespace wagen;
+
 export namespace voo::offscreen {
   class host_buffer {
     vee::buffer m_buf;
@@ -32,8 +34,8 @@ export namespace voo::offscreen {
 
   public:
     buffers(vee::physical_device pd, vee::extent ext, vee::format img)
-        : m_colour { bound_image::create(ext, img, vee::image_usage_colour_attachment, VK_IMAGE_USAGE_TRANSFER_SRC_BIT) }
-        , m_depth { bound_image::create_depth(ext) }
+        : m_colour { bound_image::create(ext, img, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT) }
+        , m_depth { bound_image::create_depth(ext, 0) }
         , m_host { pd, ext }
         , m_rp { vee::create_render_pass({
           .attachments {{

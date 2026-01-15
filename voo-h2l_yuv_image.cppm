@@ -27,7 +27,7 @@ public:
       , m_smp_conv{vee::create_sampler_yuv420p_conversion(pd)}
       , m_w{w}
       , m_h{h} {
-    m_img = vee::create_image({m_w, m_h}, VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM);
+    m_img = vee::create_image({m_w, m_h}, VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
     m_mem = vee::create_local_image_memory(pd, *m_img);
     vee::bind_image_memory(*m_img, *m_mem);
     m_iv = vee::create_yuv420p_image_view(*m_img, *m_smp_conv);

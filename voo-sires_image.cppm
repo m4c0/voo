@@ -109,7 +109,7 @@ namespace voo {
   
       constexpr const auto fmt = VK_FORMAT_R8G8B8A8_SRGB;
       vee::extent ext { w, h };
-      bi->img = vee::create_image(ext, fmt);
+      bi->img = vee::create_image(ext, fmt, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
       bi->mem = vee::create_local_image_memory(pd, *bi->img);
       vee::bind_image_memory(*bi->img, *bi->mem);
       bi->iv = vee::create_image_view(*bi->img, fmt);
