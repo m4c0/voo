@@ -22,12 +22,12 @@ export namespace voo {
       vee::render_pass_begin rpb;
     };
 
-    explicit swapchain(const device_and_queue & dq)
-      : swapchain { dq.physical_device(), dq.surface() }
+    explicit swapchain(const device_and_queue & dq, bool vsync = true)
+      : swapchain { dq.physical_device(), dq.surface(), vsync }
     {}
 
-    swapchain(vee::physical_device pd, vee::surface::type s)
-      : m_swc { vee::create_swapchain(pd, s) }
+    swapchain(vee::physical_device pd, vee::surface::type s, bool vsync = true)
+      : m_swc { vee::create_swapchain(pd, s, vsync) }
       , m_ext { extent_of(pd, s) }
     {
       auto swc_imgs = vee::get_swapchain_images(*m_swc);
