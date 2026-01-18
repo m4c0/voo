@@ -1,5 +1,5 @@
 export module voo:one_quad;
-import :device_and_queue;
+import :buffers;
 import :guards;
 import :mapmem;
 import vee;
@@ -20,26 +20,19 @@ namespace voo {
   // TODO: make this "singleton-able"
   // TODO: make a "local" variant
 export class one_quad {
-  vee::buffer m_qbuf;
-  vee::device_memory m_qmem;
+  bound_buffer m_b = bound_buffer::create_from_host(sizeof(quad), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
 public:
-  explicit one_quad(vee::physical_device pd) {
-    m_qbuf = vee::create_vertex_buffer(sizeof(quad));
-    m_qmem = vee::create_host_memory(pd, sizeof(quad));
-    vee::bind_buffer_memory(*m_qbuf, *m_qmem, 0);
-
-    mapmem mem{*m_qmem};
+  explicit one_quad() {
+    mapmem mem { *m_b.memory };
     *static_cast<quad *>(*mem) = {};
   }
-  explicit one_quad(const device_and_queue &dq)
-      : one_quad(dq.physical_device()) {}
 
-  [[nodiscard]] constexpr auto buffer() const { return *m_qbuf; }
+  [[nodiscard]] constexpr auto buffer() const { return *m_b.buffer; }
 
   void run(vee::command_buffer cb, unsigned idx, unsigned inst = 1,
            unsigned first_inst = 0) const {
-    vee::cmd_bind_vertex_buffers(cb, idx, *m_qbuf);
+    vee::cmd_bind_vertex_buffers(cb, idx, *m_b.buffer);
     vee::cmd_draw(cb, quad::v_count, inst, first_inst);
   }
 

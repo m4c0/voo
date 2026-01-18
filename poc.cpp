@@ -11,8 +11,8 @@ struct inst {
   float x, y;
 };
 
-void create_instances(voo::h2l_buffer * insts) {
-  voo::mapmem m { insts->host_memory() };
+void create_instances(voo::bound_buffer * insts) {
+  voo::mapmem m { *insts->memory };
   static_cast<inst *>(*m)[0] = { rng::randf(), rng::randf() };
   static_cast<inst *>(*m)[1] = { -1, -1 };
 }
@@ -33,11 +33,10 @@ struct thread : public sith::thread {
     auto rp = voo::single_att_render_pass(dq);
     while (!interrupted()) {
       voo::swapchain_and_stuff sw { dq, *rp };
-      voo::one_quad quad { dq };
+      voo::one_quad quad {};
 
       constexpr const unsigned sz = 2 * sizeof(inst);
-      auto u = voo::updater { dq.queue(), &create_instances, dq, sz };
-      sith::run_guard ut { &u };
+      auto insts = voo::bound_buffer::create_from_host(sz, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
       vee::pipeline_layout pl = vee::create_pipeline_layout();
       auto gp = vee::create_graphics_pipeline({
@@ -58,6 +57,9 @@ struct thread : public sith::thread {
       });
 
       while (!interrupted()) {
+        // TODO: sync CPU+GPU
+        create_instances(&insts);
+        
         sw.acquire_next_image();
         sw.queue_one_time_submit([&] {
           auto scb = sw.cmd_render_pass();
@@ -65,7 +67,7 @@ struct thread : public sith::thread {
           vee::cmd_set_viewport(cb, sw.extent());
           vee::cmd_set_scissor(cb, sw.extent());
           vee::cmd_bind_gr_pipeline(cb, *gp);
-          vee::cmd_bind_vertex_buffers(cb, 1, u.data().local_buffer());
+          vee::cmd_bind_vertex_buffers(cb, 1, *insts.buffer);
           quad.run(cb, 0, 2);
         });
         sw.queue_present();

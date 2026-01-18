@@ -21,9 +21,9 @@ export class h2l_yuv_image {
 public:
   h2l_yuv_image() = default;
   explicit h2l_yuv_image(vee::physical_device pd, unsigned w, unsigned h)
-      : m_buf_y{bound_buffer::create_from_host(pd, w * h)}
-      , m_buf_u{bound_buffer::create_from_host(pd, w * h / 4)}
-      , m_buf_v{bound_buffer::create_from_host(pd, w * h / 4)}
+      : m_buf_y{bound_buffer::create_from_host(w * h,     VK_BUFFER_USAGE_TRANSFER_SRC_BIT)}
+      , m_buf_u{bound_buffer::create_from_host(w * h / 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT)}
+      , m_buf_v{bound_buffer::create_from_host(w * h / 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT)}
       , m_smp_conv{vee::create_sampler_yuv420p_conversion(pd)}
       , m_w{w}
       , m_h{h} {
