@@ -71,13 +71,6 @@ public:
 
   void queue_submit() { m_swc.queue_submit(m_cb.cb()); }
   void queue_present() { m_swc.queue_present(); }
-
-  void queue_one_time_submit(auto &&fn) {
-    {
-      voo::cmd_buf_one_time_submit ots { m_cb.cb() };
-      fn();
-    }
-    queue_submit();
-  }
+  void queue_one_time_submit(auto &&fn) { m_swc.queue_one_time_submit(m_cb.cb(), fn); }
 };
 } // namespace voo

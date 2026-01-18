@@ -1,5 +1,6 @@
 export module voo:swapchain;
 import :device_and_queue;
+import :guards;
 import :queue;
 import :frame_sync_stuff;
 import hai;
@@ -89,6 +90,14 @@ export namespace voo {
         .wait_semaphore = m_sync.rnd_finished_sema(),
         .image_index = m_idx,
       });
+    }
+
+    void queue_one_time_submit(vee::command_buffer cb, auto && fn) {
+      {
+        voo::cmd_buf_one_time_submit ots { cb };
+        fn();
+      }
+      queue_submit(cb);
     }
   };
 }
