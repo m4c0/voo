@@ -13,6 +13,7 @@ export namespace voo {
   class swapchain {
     voo::frame_sync_stuff m_sync {};
     vee::swapchain m_swc;
+    hai::array<vee::image::type> m_imgs;
     hai::array<vee::image_view> m_civs;
     vee::extent m_ext;
     unsigned m_idx;
@@ -29,18 +30,19 @@ export namespace voo {
 
     swapchain(vee::physical_device pd, vee::surface::type s, bool vsync = true)
       : m_swc { vee::create_swapchain(pd, s, vsync) }
+      , m_imgs { vee::get_swapchain_images(*m_swc) }
       , m_ext { extent_of(pd, s) }
     {
-      auto swc_imgs = vee::get_swapchain_images(*m_swc);
-      m_civs = hai::array<vee::image_view> { swc_imgs.size() };
+      m_civs = hai::array<vee::image_view> { m_imgs.size() };
 
-      for (auto i = 0; i < swc_imgs.size(); i++) {
-        m_civs[i] = vee::create_image_view_for_surface(swc_imgs[i], pd, s);
+      for (auto i = 0; i < m_imgs.size(); i++) {
+        m_civs[i] = vee::create_image_view_for_surface(m_imgs[i], pd, s);
       }
     }
 
     [[nodiscard]] constexpr auto count() const { return m_civs.size(); }
     [[nodiscard]] constexpr auto extent() const { return m_ext; }
+    [[nodiscard]] constexpr auto image(unsigned i) const { return m_imgs[i]; }
     [[nodiscard]] constexpr auto image_view(unsigned i) const { return *m_civs[i]; }
     [[nodiscard]] constexpr auto index() const { return m_idx; }
 
