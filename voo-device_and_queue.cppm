@@ -3,6 +3,9 @@ import :queue;
 import mtx;
 import no;
 import vee;
+import wagen;
+
+using namespace wagen;
 
 export namespace voo {
 [[nodiscard]] auto extent_of(vee::physical_device pd, vee::surface::type s) {
@@ -18,6 +21,12 @@ class device_and_queue : no::no {
   unsigned m_qf;
 
 public:
+  struct params {
+    bool debug = true;
+    VkPhysicalDeviceFeatures feats {};
+    void * next = nullptr;
+  };
+
   device_and_queue(const char *app_name, bool debug = true) {
     m_i = vee::create_instance(app_name);
     if (debug) m_dbg = vee::create_debug_utils_messenger();
@@ -28,17 +37,19 @@ public:
     m_d = vee::create_single_queue_device(pd, qf);
     voo::queue::universal(qf);
   }
-  device_and_queue(const char *app_name, auto native_ptr, bool debug = true) {
+  device_and_queue(const char *app_name, auto native_ptr, const params & p) {
     m_i = vee::create_instance(app_name);
-    if (debug) m_dbg = vee::create_debug_utils_messenger();
+    if (p.debug) m_dbg = vee::create_debug_utils_messenger();
     m_s = vee::create_surface(native_ptr);
     auto [pd, qf] = vee::find_physical_device_with_universal_queue(*m_s);
     m_pd = pd;
     m_qf = qf;
 
-    m_d = vee::create_single_queue_device(pd, qf);
+    m_d = vee::create_single_queue_device(pd, qf, p.feats, p.next);
     voo::queue::universal(qf);
   }
+  device_and_queue(const char *app_name, auto native_ptr) : device_and_queue { app_name, native_ptr, {} } {}
+
   ~device_and_queue() { vee::device_wait_idle(); }
 
   [[nodiscard]] constexpr const auto physical_device() const { return m_pd; }
