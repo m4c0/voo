@@ -28,6 +28,11 @@ public:
   explicit constexpr operator bool() const { return *m_mod; }
 };
 
+  export struct comp_shader : shader {
+    using shader::shader;
+    [[nodiscard]] auto operator*() const { return mod(); }
+  };
+
   export struct frag_shader : shader {
     using shader::shader;
   
