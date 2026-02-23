@@ -8,12 +8,17 @@ namespace voo {
     vee::command_pool m_cp;
     vee::command_buffer m_cb;
   public:
-    explicit single_cb()
-      : single_cb { voo::queue::universal()->queue_family() }
+    explicit single_cb(bool primary = true)
+      : single_cb { voo::queue::universal()->queue_family(), primary }
     {}
-    explicit single_cb(unsigned qf)
-      : m_cp { vee::create_command_pool(qf) }
-      , m_cb { vee::allocate_primary_command_buffer(*m_cp) } {}
+    explicit single_cb(unsigned qf, bool primary = true) :
+      m_cp { vee::create_command_pool(qf) }
+    , m_cb {
+      primary
+        ? vee::allocate_primary_command_buffer(*m_cp)
+        : vee::allocate_secondary_command_buffer(*m_cp)
+    }
+    {}
 
     [[nodiscard]] constexpr auto cb() const { return m_cb; }
   };
