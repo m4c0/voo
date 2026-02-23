@@ -18,7 +18,21 @@ namespace voo {
     vee::end_cmd_buf>;
 
   export using cmd_buf_one_time_submit = cb_guard<vee::begin_cmd_buf_one_time_submit>;
-  export using cmd_buf_sim_use = cb_guard<vee::begin_cmd_buf_sim_use>;
+
+  export using cmd_buf_sim_use = hay<
+    vee::command_buffer,
+    [](vee::command_buffer cb) {
+      vee::begin_cmd_buf_sim_use(cb, false);
+      return cb;
+    },
+    vee::end_cmd_buf>;
+  export using cmd_buf_sim_use_inherit = hay<
+    vee::command_buffer,
+    [](vee::command_buffer cb) {
+      vee::begin_cmd_buf_sim_use(cb, true);
+      return cb;
+    },
+    vee::end_cmd_buf>;
 
   export using cmd_buf_render_pass_continue = hay<
     vee::command_buffer,
