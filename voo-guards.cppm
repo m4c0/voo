@@ -49,4 +49,6 @@ namespace voo {
       return rpb.command_buffer;
     },
     vee::cmd_end_render_pass>;
+
+  export void run(auto && guard, auto && fn) { fn(); }
 }
