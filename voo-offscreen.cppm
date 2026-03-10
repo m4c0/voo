@@ -25,18 +25,18 @@ export namespace voo::offscreen {
         , m_host { bound_buffer::create_from_host(ext.width * ext.height * 4, VK_BUFFER_USAGE_TRANSFER_DST_BIT) }
         , m_rp { vee::create_render_pass({
           .attachments {{
-            vee::create_colour_attachment(img, vee::image_layout_color_attachment_optimal),
-            vee::create_depth_attachment(),
+            vee::colour_attachment(img, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL),
+            vee::depth_attachment(),
           }},
           .subpasses {{
-            vee::create_subpass({
-              .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
-              .depth_stencil = create_attachment_ref(1, vee::image_layout_depth_stencil_attachment_optimal),
+            vee::subpass({
+              .colours {{ vee::attachment_ref(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) }},
+              .depth_stencil = vee::attachment_ref(1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL),
             }),
           }},
           .dependencies {{
-            vee::create_colour_dependency(),
-            vee::create_depth_dependency(),
+            vee::colour_dependency(),
+            vee::depth_dependency(),
           }},
         }) }
         , m_fb { vee::create_framebuffer({

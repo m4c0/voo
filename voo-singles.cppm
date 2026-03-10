@@ -50,15 +50,15 @@ namespace voo {
   export inline auto single_att_render_pass(vee::physical_device pd, vee::surface::type s) {
     return vee::create_render_pass({
       .attachments {{
-        vee::create_colour_attachment(pd, s),
+        vee::colour_attachment(pd, s),
       }},
       .subpasses {{
-        vee::create_subpass({
-          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
+        vee::subpass({
+          .colours {{ vee::attachment_ref(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) }},
         }),
       }},
       .dependencies {{
-        vee::create_colour_dependency(),
+        vee::colour_dependency(),
       }},
     });
   }
@@ -69,18 +69,18 @@ namespace voo {
   export inline auto single_att_depth_render_pass(vee::physical_device pd, vee::surface::type s) {
     return vee::create_render_pass({
       .attachments {{
-        vee::create_colour_attachment(pd, s),
-        vee::create_depth_attachment(),
+        vee::colour_attachment(pd, s),
+        vee::depth_attachment(),
       }},
       .subpasses {{
-        vee::create_subpass({
-          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
-          .depth_stencil = vee::create_attachment_ref(1, vee::image_layout_depth_stencil_attachment_optimal),
+        vee::subpass({
+          .colours {{ vee::attachment_ref(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) }},
+          .depth_stencil = vee::attachment_ref(1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL),
         }),
       }},
       .dependencies {{
-        vee::create_colour_dependency(),
-        vee::create_depth_dependency(),
+        vee::colour_dependency(),
+        vee::depth_dependency(),
       }},
     });
   }
