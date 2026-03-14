@@ -10,6 +10,7 @@ export import :images;
 export import :mapmem;
 export import :offscreen;
 export import :one_quad;
+export import :pipelines;
 export import :shader;
 export import :singles;
 export import :sires_image;

@@ -39,13 +39,9 @@ struct thread : public sith::thread {
       auto insts = voo::bound_buffer::create_from_host(sz, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
       vee::pipeline_layout pl = vee::create_pipeline_layout();
-      auto gp = vee::create_graphics_pipeline({
+      auto gp = voo::create_graphics_pipeline("poc", {
           .pipeline_layout = *pl,
           .render_pass = *rp,
-          .shaders {
-              *voo::vert_shader("poc.vert.spv"),
-              *voo::frag_shader("poc.frag.spv"),
-          },
           .bindings {
               quad.vertex_input_bind(),
               vee::vertex_input_bind_per_instance(sizeof(inst)),
