@@ -22,7 +22,10 @@ namespace voo {
     }
 
     static bound_image create(wagen::VkImageCreateInfo info, wagen::VkImageSubresourceRange sub) {
-      return create(info, vee::image_view_create_info({ .subresourceRange = sub }));
+      return create(info, VkImageViewCreateInfo {
+        .viewType = VK_IMAGE_VIEW_TYPE_2D,
+        .subresourceRange = sub,
+      });
     }
 
     static bound_image create(wagen::VkImageCreateInfo info, wagen::VkImageAspectFlags aspect) {
