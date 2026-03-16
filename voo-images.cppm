@@ -8,20 +8,21 @@ namespace voo {
     vee::device_memory mem {};
     vee::image_view iv {};
 
-    static bound_image create(wagen::VkImageCreateInfo info, wagen::VkImageSubresourceRange sub) {
+    static bound_image create(wagen::VkImageCreateInfo info, wagen::VkImageViewCreateInfo iv) {
       bound_image res {};
       res.img = vee::image { &info };
       res.mem = vee::create_local_image_memory(wagen::physical_device(), *res.img);
       vee::bind_image_memory(*res.img, *res.mem);
 
-      auto iv = vee::image_view_create_info({
-        .image = *res.img,
-        .format = info.format,
-        .subresourceRange = sub,
-      });
+      iv.image = *res.img;
+      iv.format = info.format;
       res.iv = vee::image_view { &iv };
 
       return res;
+    }
+
+    static bound_image create(wagen::VkImageCreateInfo info, wagen::VkImageSubresourceRange sub) {
+      return create(info, vee::image_view_create_info({ .subresourceRange = sub }));
     }
 
     static bound_image create(wagen::VkImageCreateInfo info, wagen::VkImageAspectFlags aspect) {
