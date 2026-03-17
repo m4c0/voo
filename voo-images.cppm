@@ -16,7 +16,7 @@ namespace voo {
 
       iv.image = *res.img;
       iv.format = info.format;
-      res.iv = vee::image_view { &iv };
+      res.iv = vee::create_image_view(iv);
 
       return res;
     }
