@@ -16,4 +16,11 @@ namespace voo {
     vee::set_debug_utils_object_name(*res, name);
     return res;
   }
+
+  // TODO: find better place for this
+  export auto allocate_descriptor_set(const char * name, VkDescriptorPool pool, VkDescriptorSetLayout dsl) {
+    auto dset = vee::allocate_descriptor_set(pool, dsl);
+    vee::set_debug_utils_object_name(VK_OBJECT_TYPE_DESCRIPTOR_SET, dset, name);
+    return dset;
+  }
 }
