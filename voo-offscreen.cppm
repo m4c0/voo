@@ -19,7 +19,7 @@ export namespace voo::offscreen {
     vee::extent m_ext;
 
   public:
-    buffers(vee::extent ext, vee::format img)
+    buffers(VkExtent2D ext, VkFormat img)
         : m_colour { bound_image::create(ext, img, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT) }
         , m_depth { bound_image::create_depth(ext, 0) }
         , m_host { bound_buffer::create_from_host(ext.width * ext.height * 4, VK_BUFFER_USAGE_TRANSFER_DST_BIT) }

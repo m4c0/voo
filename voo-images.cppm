@@ -36,7 +36,7 @@ namespace voo {
       return create(vee::depth_image_create_info(ext, usage), VK_IMAGE_ASPECT_DEPTH_BIT);
     }
 
-    static bound_image create(vee::extent ext, vee::format fmt, wagen::VkImageUsageFlags usage) {
+    static bound_image create(VkExtent2D ext, VkFormat fmt, wagen::VkImageUsageFlags usage) {
       return create(vee::image_create_info(ext, fmt, usage), VK_IMAGE_ASPECT_COLOR_BIT);
     }
   };

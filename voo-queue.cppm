@@ -9,7 +9,7 @@ namespace voo {
 /// Vulkan. It was designed with single-queue devices in mind (ex: Apple).
 export class queue {
   mtx::mutex m_qmtx{};
-  vee::queue m_q{};
+  VkQueue m_q{};
   unsigned m_qf{};
 
 public:
